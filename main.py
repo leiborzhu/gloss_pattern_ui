@@ -112,9 +112,33 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_pattern_start_R_3.setEnabled(con)
         self.lineEdit_pattern_start_R_4.setEnabled(con)
 
+
+
+    def set_changeBox_able_R(self):
+        if self.checkBox_R_1.isChecked():
+            self.checkBox_R_1.setEnabled(1)
+        else:
+            self.checkBox_R_2.setChecked(0)
+            self.checkBox_R_2.setEnabled(0)
+
+        if self.checkBox_R_2.isChecked():
+            self.checkBox_R_2.setEnabled(1)
+        else:
+            self.checkBox_R_3.setChecked(0)
+            self.checkBox_R_3.setEnabled(0)
+
+        if self.checkBox_R_3.isChecked():
+            self.checkBox_R_3.setEnabled(1)
+        else:
+            self.checkBox_R_4.setChecked(0)
+            self.checkBox_R_4.setEnabled(0)
+
     def set_change_able(self):
         if self.radioButton_1.isChecked():
-            self.set_box_able(True)
+            self.checkBox_L_1.setEnabled(1)
+            self.checkBox_R_1.setEnabled(1)
+            # self.set_L_1_able_all(1)
+            # self.set_R_1_able_all(1)
             # self.set_all_able(True)
         else:
             self.set_box_able(False)
@@ -209,6 +233,30 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         movie = Movie_MP4(r'D:\pattern\video\1_1_阿昌族.mp4')
         movie.play()
 
+    def set_link_able_L(self):
+        if self.checkBox_L_1.isChecked():
+            self.checkBox_L_2.setEnabled(1)
+            # self.set_L_2_able_all(1)
+        else:
+            self.checkBox_L_2.setChecked(0)
+            self.checkBox_L_2.setEnabled(0)
+            self.set_L_2_able_all(0)
+        if self.checkBox_L_2.isChecked():
+            # self.set_L_3_able_all(1)
+            self.checkBox_L_3.setEnabled(1)
+        else:
+            self.checkBox_L_3.setChecked(0)
+            self.checkBox_L_3.setEnabled(0)
+            self.set_L_3_able_all(0)
+
+        if self.checkBox_L_3.isChecked():
+            self.checkBox_L_4.setEnabled(1)
+            # self.set_L_4_able_all(1)
+        else:
+            self.checkBox_L_4.setChecked(0)
+            self.checkBox_L_4.setEnabled(0)
+            self.set_L_4_able_all(0)
+
     def set_L_1_able_all(self, con: bool):
         self.lineEdit_pattern_index_L_1.setEnabled(con)
         self.lineEdit_pattern_fade_in_L_1.setEnabled(con)
@@ -221,6 +269,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.set_L_1_able_all(True)
         else:
             self.set_L_1_able_all(False)
+        self.set_link_able_L()
 
     def set_L_2_able_all(self, con: bool):
         self.lineEdit_pattern_index_L_2.setEnabled(con)
@@ -234,6 +283,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.set_L_2_able_all(True)
         else:
             self.set_L_2_able_all(False)
+        self.set_link_able_L()
 
     def set_L_3_able_all(self, con: bool):
         self.lineEdit_pattern_index_L_3.setEnabled(con)
@@ -247,6 +297,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.set_L_3_able_all(True)
         else:
             self.set_L_3_able_all(False)
+        self.set_link_able_L()
 
     def set_L_4_able_all(self, con: bool):
         self.lineEdit_pattern_index_L_4.setEnabled(con)
@@ -261,6 +312,32 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.set_L_4_able_all(False)
 
+        self.set_link_able_L()
+
+    def set_link_able_R(self):
+        if self.checkBox_R_1.isChecked():
+            self.checkBox_R_2.setEnabled(1)
+            # self.set_R_2_able_all(1)
+        else:
+            self.checkBox_R_2.setChecked(0)
+            self.checkBox_R_2.setEnabled(0)
+            self.set_R_2_able_all(0)
+        if self.checkBox_R_2.isChecked():
+            # self.set_R_3_able_all(1)
+            self.checkBox_R_3.setEnabled(1)
+        else:
+            self.checkBox_R_3.setChecked(0)
+            self.checkBox_R_3.setEnabled(0)
+            self.set_R_3_able_all(0)
+
+        if self.checkBox_R_3.isChecked():
+            self.checkBox_R_4.setEnabled(1)
+            # self.set_R_4_able_all(1)
+        else:
+            self.checkBox_R_4.setChecked(0)
+            self.checkBox_R_4.setEnabled(0)
+            self.set_R_4_able_all(0)
+
     def set_R_1_able_all(self, con: bool):
         self.lineEdit_pattern_index_R_1.setEnabled(con)
         self.lineEdit_pattern_fade_in_R_1.setEnabled(con)
@@ -272,7 +349,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.checkBox_R_1.isChecked():
             self.set_R_1_able_all(True)
         else:
+
             self.set_R_1_able_all(False)
+
+        self.set_link_able_R()
 
     def set_R_2_able_all(self, con: bool):
         self.lineEdit_pattern_index_R_2.setEnabled(con)
@@ -287,6 +367,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.set_R_2_able_all(False)
 
+        self.set_link_able_R()
+
     def set_R_3_able_all(self, con: bool):
         self.lineEdit_pattern_index_R_3.setEnabled(con)
         self.lineEdit_pattern_fade_in_R_3.setEnabled(con)
@@ -300,6 +382,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.set_R_3_able_all(False)
 
+        self.set_link_able_R()
+
     def set_R_4_able_all(self, con: bool):
         self.lineEdit_pattern_index_R_4.setEnabled(con)
         self.lineEdit_pattern_fade_in_R_4.setEnabled(con)
@@ -312,6 +396,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.set_R_4_able_all(True)
         else:
             self.set_R_4_able_all(False)
+
+        self.set_link_able_R()
 
 if __name__ == '__main__':
     # dataBase_csv = csv.reader(open(r'D:\UI\word_box\data\data_w_rep.csv', 'r'))
