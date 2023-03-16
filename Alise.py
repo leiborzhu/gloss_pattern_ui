@@ -1,6 +1,6 @@
 indexAlise = 'index（词目序号）'
 glossAlise = 'combine（词目）'
-isCorrectAlise = 'IsCorrect（值0，1，2，3）'
+isCorrectAlise = 'IsCorrect（值1，2，3）'
 patterAlise_L_1 = 'L_handshape_1'
 fadeInAlise_L_1 = 'L_fade_in_F_1'
 startAlise_L_1 = 'L_start_F_1'
@@ -48,7 +48,13 @@ fadeInAlise_R_4 = 'R_fade_in_F_4'
 startAlise_R_4 = 'R_start_F_4'
 endAlise_R_4 = 'R_end_F_4'
 fadeOutAlise_R_4 = 'R_fade_out_4'
-max_frameAlise = 'max_frame'
+max_frameAlise = 'frame_num'
+
+videoAlise_res = 'sourevideo_dir'
+videoAlise_per = 'performancevideo_dir'
+remarkAlise = 'remark'
+dateAlise = 'data(日期）'
+
 optional_label = [patterAlise_L_1, fadeInAlise_L_1, startAlise_L_1, endAlise_L_1, fadeOutAlise_L_1,
                   patterAlise_L_2, fadeInAlise_L_2, startAlise_L_2, endAlise_L_2, fadeOutAlise_L_2,
                   patterAlise_L_3, fadeInAlise_L_3, startAlise_L_3, endAlise_L_3, fadeOutAlise_L_3,
