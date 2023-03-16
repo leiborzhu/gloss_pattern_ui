@@ -28,7 +28,7 @@ saveCon = 0
 index_cur = 0
 from Alise import *
 
-
+rootPath = os.path.dirname(os.path.realpath(sys.executable))
 class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -41,7 +41,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton_load.clicked.connect(self.load)
         self.pushButton_save.clicked.connect(self.save)
         self.pushButton_video_res.clicked.connect(self.open_video_res)
-
+        self.pushButton_video_per.clicked.connect(self.open_video_pre)
         self.radioButton_1.clicked.connect(self.set_change_able)
         self.radioButton_2.clicked.connect(self.set_change_able)
         self.radioButton_3.clicked.connect(self.set_change_able)
@@ -107,7 +107,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         connectCondiChange()
 
-    def set_box_able(self, con:bool):
+    def set_box_able(self, con: bool):
         self.checkBox_L_1.setEnabled(con)
         self.checkBox_L_2.setEnabled(con)
         self.checkBox_L_3.setEnabled(con)
@@ -118,7 +118,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.checkBox_R_3.setEnabled(con)
         self.checkBox_R_4.setEnabled(con)
 
-    def set_box_check(self, con:bool):
+    def set_box_check(self, con: bool):
         self.checkBox_L_1.setChecked(con)
         self.checkBox_L_2.setChecked(con)
         self.checkBox_L_3.setChecked(con)
@@ -231,6 +231,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     # 更新界面，数据状态
     def refresh(self, index_cur):
 
+        global saveCon
+        saveCon = 0
         lineCur = dataGroup[index_cur]
         self.label_gloss.setText(str(lineCur[glossAlise]))
         self.label_gloss_index.setText(str(int(lineCur[indexAlise])))
@@ -374,10 +376,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         if str(lineCur[isCorrectAlise]) != '':
             if int(lineCur[isCorrectAlise] == 1):
+                contUpdate()
                 self.radioButton_1.setChecked(1)
                 self.checkBox_R_1.setEnabled(1)
                 self.checkBox_L_1.setEnabled(1)
-                contUpdate()
+
+
+
             elif int(lineCur[isCorrectAlise] == 2):
                 self.radioButton_2.setChecked(1)
                 self.clearAll()
@@ -401,13 +406,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             qmessagebox.warning(self, '警告', '请输入操作员姓名')
             return
 
-        if self.lineEdit_date.text() == '':
-            qmessagebox.warning(self, '警告', '请输入日期')
-            return
 
         filePathLoad = os.path.dirname(os.path.realpath(sys.executable))
         # print(1)
-        file = 'D:\pattern\动作修复 词目标注工具\词目动作原语模板标注工具 关键字段表格.xls'  # 文件路径
+        file = os.path.join(rootPath,
+                            '词目动作原语模板标注工具 关键字段表格.xls')
+        # file = 'D:\pattern\动作修复 词目标注工具\词目动作原语模板标注工具 关键字段表格.xls'  # 文件路径
         try:
             wb = xlrd.open_workbook(filename=file)  # 用方法打开该文件路径下的文件
         except:
@@ -435,6 +439,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # print(dataGroup[0]['describe'])
         index_cur = 0
         self.refresh(index_cur)
+
+        def buttom_check():
+            self.pushButton_save.setEnabled(1)
+            self.pushButton_prev.setEnabled(1)
+            self.pushButton_next.setEnabled(1)
+            self.pushButton_video_res.setEnabled(1)
+            self.pushButton_video_per.setEnabled(1)
+            self.pushButton_output.setEnabled(1)
+            self.pushButton_toIndex.setEnabled(1)
+
+        buttom_check()
+
 
     def clearAll(self):
         self.set_box_able(0)
@@ -560,20 +576,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             dataGroup[index_cur][isCorrectAlise] = 3
             clear_and_load()
 
-
-
-
     def save(self):
         qmessagebox = QMessageBox()
 
         workbook = xlwt.Workbook(encoding='utf-8')
         ws = workbook.add_sheet("Sheet1")
 
+
         if not self.check_isnum_valid():
             return
 
         self.dataUpdate()
 
+        # 检查需修改的情况下是否有动作信息
+        if not self.check_isChecked():
+            return
         if not self.check_frame_valid():
             return
 
@@ -594,15 +611,28 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         qmessagebox.about(self, '保存文件', '保存成功')
 
         self.label_save_condi.setText("文件已保存")
+        global saveCon
         saveCon = 1
 
     def saveConti(self) -> bool:
         qmessagebox = QMessageBox()
+        global saveCon
         if saveCon == 1:
             return True
         else:
             reply = QMessageBox.question(self, '警告', '数据未保存,是否继续', QMessageBox.Yes | QMessageBox.No)
             return reply == QMessageBox.Yes
+
+    def check_isChecked(self) -> bool:
+        qmessagebox = QMessageBox()
+
+        if int(dataGroup[index_cur][isCorrectAlise]) == 1:
+            haveChecked = self.checkBox_L_1.isChecked() + self.checkBox_R_1.isChecked()
+            print(haveChecked)
+            if not haveChecked:
+                qmessagebox.warning(self, '警告', '请至少填入一个动作')
+                return False
+        return True
 
     def check_isnum_valid(self) -> bool:
         qmessagebox = QMessageBox()
@@ -814,11 +844,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 qmessagebox.warning(self, '警告', '动作R4帧数设置有误')
                 return False
         return True
-      
 
     def glossNext(self):
         qmessagebox = QMessageBox()
-
+        if not self.saveConti():
+            return
         global index_cur
         if index_cur + 1 >= len(dataGroup):
             qmessagebox.warning(self, '警告', '没有下一个词')
@@ -829,7 +859,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def glossprev(self):
         qmessagebox = QMessageBox()
-
+        if not self.saveConti():
+            return
         global index_cur
         if index_cur == 0:
             qmessagebox.warning(self, '警告', '没有上一个词')
@@ -839,7 +870,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.refresh(index_cur)
 
     def toIndex(self):
-        return
+        qmessagebox = QMessageBox()
+        index_tmp = self.lineEdit_to_index.text()
+
+        if not index_tmp.isnumeric():
+            qmessagebox.warning(self, '警告', '请输入数字编号')
+            return
+        if int(index_tmp) > len(dataGroup) or int(index_tmp) < 1:
+            qmessagebox.warning(self, '警告', '超出序列范围')
+            return
+        # print(int(index_tmp))
+        if not self.saveConti():
+            return
+        index_cur = int(index_tmp) - 1
+
+        self.refresh(index_cur)
 
     def checkCon(self):
         qmessagebox = QMessageBox()
@@ -860,9 +905,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         class Movie_MP4(Video):
             type = 'MP4'  # 此处以MP4格式为例
 
-
         movie = Movie_MP4(r'D:\pattern\video\1_1_阿昌族.mp4')
         movie.play()
+
+    def open_video_pre(self):
+        return
 
     def set_link_able_L(self):
         if self.checkBox_L_1.isChecked():
