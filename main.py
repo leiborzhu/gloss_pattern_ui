@@ -22,7 +22,7 @@ import os
 from os import startfile
 import csv
 from Dialog import Ui_Dialog
-
+from Dialog_hint import Ui_Dialog_hint
 dataBase = []
 key_label = []
 data_dict_oneLine = {}
@@ -33,6 +33,23 @@ from Alise import *
 
 rootPath = os.path.dirname(os.path.realpath(sys.executable))
 rem_tmp = []
+
+
+class HintWindow(QDialog, Ui_Dialog_hint):
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint)
+        self.setupUi(self)
+
+        self.pushButton_back.clicked.connect(self.back)
+        self.textEdit_hint.setText(dataGroup[index_cur][describeAlise])
+
+    def back(self):
+        self.close()
+
+    def showDialog(self):
+        self.show()
+
 
 class DialogWindow(QDialog, Ui_Dialog):
     def __init__(self):
@@ -61,6 +78,8 @@ class DialogWindow(QDialog, Ui_Dialog):
 class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint)
+        self.setFixedSize(1366, 768)
         self.setupUi(self)
         self.set_all_able(False)
         self.set_box_able(False)
@@ -73,6 +92,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton_video_per.clicked.connect(self.open_video_pre)
         self.pushButton_readme.clicked.connect(self.readme)
         self.pushButton_output.clicked.connect(self.output)
+        self.pushButton_hint.clicked.connect(self.hint)
 
         self.radioButton_1.clicked.connect(self.set_change_able)
         self.radioButton_2.clicked.connect(self.set_change_able)
@@ -441,14 +461,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         # print(os.path.dirname(os.path.realpath(sys.executable)))
         filePathLoad = os.path.dirname(os.path.realpath(sys.executable))
+        name = self.lineEdit_operater.text().strip()
 
         file = os.path.join(rootPath,
-                            '词目动作原语模板标注工具 关键字段表格.xls')
+                            '词目动作原语模板分类标注工具_' + name + '.xls')
         # file = 'D:\pattern\动作修复 词目标注工具\词目动作原语模板标注工具 关键字段表格.xls'  # 文件路径
         try:
             wb = xlrd.open_workbook(filename=file)  # 用方法打开该文件路径下的文件
         except:
-            qmessagebox.warning(self, '警告', '文件打开失败，请检查姓名、日期、表格是否被占用')
+            qmessagebox.warning(self, '警告', '文件打开失败，请检查姓名、表格是否被占用')
             return
         ws = wb.sheet_by_name("Sheet1")  # 打开该表格里的表单
 
@@ -470,7 +491,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for j in range(len(key_label)):
                 data_dict_line_tmp[key_label[j]] = dataBase[i][j]
             dataGroup.append(data_dict_line_tmp)
-        # print(i)
+
         index_cur = 0
         self.refresh(index_cur)
 
@@ -483,14 +504,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pushButton_output.setEnabled(1)
             self.pushButton_toIndex.setEnabled(1)
             self.pushButton_readme.setEnabled(1)
+            self.pushButton_hint.setEnabled(1)
 
             self.radioButton_1.setEnabled(1)
             self.radioButton_2.setEnabled(1)
             self.radioButton_3.setEnabled(1)
             self.radioButton_4.setEnabled(1)
 
+            self.lineEdit_operater.setEnabled(0)
+
         buttom_check()
 
+        qmessagebox.about(self, '导入数据', '导入成功')
 
     def clearAll(self):
         self.set_box_able(0)
@@ -545,6 +570,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_pattern_fade_out_R_4.setText('')
 
     def dataUpdate(self):
+        qmessagebox = QMessageBox()
+        # 添加操作者
+        if self.lineEdit_operater.text() == '':
+            qmessagebox.warning(self, '警告', '请输入操作者姓名')
+            return
+        else:
+            dataGroup[index_cur][operatorAlise] = self.lineEdit_operater.text()
 
         def clear_and_load():
             self.clearAll()
@@ -618,8 +650,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         dataGroup[index_cur][remarkAlise] = rem_tmp
 
+        # 添加日期
         t = time.localtime()
-        dataGroup[index_cur][dateAlise] = str(t.tm_hour) + '_' + str(t.tm_mon) + '_' + str(t.tm_mday)
+        dataGroup[index_cur][dateAlise] = str(t.tm_mon) + '_' + str(t.tm_mday)
+
+
 
     def save(self):
         qmessagebox = QMessageBox()
@@ -636,7 +671,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # 检查需修改的情况下是否有动作信息
         if not self.check_isChecked():
             return
-        # print(1)
+
         if not self.check_frame_valid():
             return
 
@@ -649,8 +684,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     dataBase[i][j] = dataGroup[i - 1][key_label[j]]
                 ws.write(i, j, dataBase[i][j])
         try:
+            name = self.lineEdit_operater.text().strip()
+
             file = os.path.join(rootPath,
-                                '词目动作原语模板标注工具 关键字段表格.xls')
+                                '词目动作原语模板分类标注工具_' + name + '.xls')
             workbook.save(file)
         except:
             qmessagebox.warning(self, '警告', '文件保存失败,请检查姓名、日期、表格是否被占用')
@@ -785,7 +822,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         qmessagebox = QMessageBox()
 
         if self.checkBox_L_1.isChecked():
-            # print(dataGroup[index_cur][max_frameAlise])
+
             blankCon_L_1_frame_valid = [
                 int(self.lineEdit_pattern_index_L_1.text()) < 1,
                 int(self.lineEdit_pattern_index_L_1.text()) > 61,
@@ -795,7 +832,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 int(self.lineEdit_pattern_fade_out_L_1.text()) <= int(self.lineEdit_pattern_end_L_1.text()),
                 int(self.lineEdit_pattern_fade_out_L_1.text()) > dataGroup[index_cur][max_frameAlise]
             ]
-            # print(1)
+
             if sum(blankCon_L_1_frame_valid) != 0:
                 qmessagebox.warning(self, '警告', '动作L1帧数设置有误')
                 return False
@@ -858,12 +895,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 int(self.lineEdit_pattern_fade_out_R_1.text()) <= int(self.lineEdit_pattern_end_R_1.text()),
                 int(self.lineEdit_pattern_fade_out_R_1.text()) > dataGroup[index_cur][max_frameAlise]
             ]
+
             if sum(blankCon_R_1_frame_valid) != 0:
                 qmessagebox.warning(self, '警告', '动作R1帧数设置有误')
                 return False
-            if int(self.lineEdit_pattern_fade_in_R_2.text()) <= int(self.lineEdit_pattern_fade_out_R_1.text()):
-                qmessagebox.warning(self, '警告', '动作R1，R2帧数设置有误')
-                return False
+
 
         if self.checkBox_R_2.isChecked():
             blankCon_R_2_frame_valid = [
@@ -878,8 +914,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if sum(blankCon_R_2_frame_valid) != 0:
                 qmessagebox.warning(self, '警告', '动作R2帧数设置有误')
                 return False
-            if int(self.lineEdit_pattern_fade_in_R_3.text()) <= int(self.lineEdit_pattern_fade_out_R_2.text()):
-                qmessagebox.warning(self, '警告', '动作R2，R3帧数设置有误')
+            if int(self.lineEdit_pattern_fade_in_R_2.text()) <= int(self.lineEdit_pattern_fade_out_R_1.text()):
+                qmessagebox.warning(self, '警告', '动作R1，R2帧数设置有误')
                 return False
         if self.checkBox_R_3.isChecked():
             blankCon_R_3_frame_valid = [
@@ -894,8 +930,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if sum(blankCon_R_3_frame_valid) != 0:
                 qmessagebox.warning(self, '警告', '动作R3帧数设置有误')
                 return False
-            if int(self.lineEdit_pattern_fade_in_R_4.text()) <= int(self.lineEdit_pattern_fade_out_R_3.text()):
-                qmessagebox.warning(self, '警告', '动作R3，R4帧数设置有误')
+            if int(self.lineEdit_pattern_fade_in_R_3.text()) <= int(self.lineEdit_pattern_fade_out_R_2.text()):
+                qmessagebox.warning(self, '警告', '动作R2，R3帧数设置有误')
                 return False
         if self.checkBox_R_4.isChecked():
             blankCon_R_4_frame_valid = [
@@ -941,6 +977,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.refresh(index_cur)
 
     def toIndex(self):
+        global index_cur
         qmessagebox = QMessageBox()
         index_tmp = self.lineEdit_to_index.text()
 
@@ -977,14 +1014,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         class Movie_MP4(Video):
             type = 'MP4'  # 此处以MP4格式为例
 
-        def addZero(s:int) -> str:
-            res = str(s)
-            for _ in range(8 - len(str(s))):
-                res = '0' + res
-            return res
-
         # (rootPath)
-        moviePath = os.path.join(rootPath, 'sourrcevideo', dataGroup[index_cur][videoAlise_res] + '.mp4')
+        if '.mp4' in dataGroup[index_cur][videoAlise_res]:
+            moviePath = os.path.join(rootPath, 'sourrcevideo', dataGroup[index_cur][videoAlise_res])
+        else:
+            moviePath = os.path.join(rootPath, 'sourrcevideo', dataGroup[index_cur][videoAlise_res] + '.mp4')
         # print(rootPath)
         # movie = Movie_MP4(r'E:\之江\pattern\sourrcevideo\00000001.mp4')
         try:
@@ -1012,8 +1046,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for _ in range(8 - len(str(s))):
                 res = '0' + res
             return res
-
-        moviePath = os.path.join(rootPath, 'performancevideo', dataGroup[index_cur][videoAlise_per])
+        if '.avi' in dataGroup[index_cur][videoAlise_per]:
+            moviePath = os.path.join(rootPath, 'performancevideo', dataGroup[index_cur][videoAlise_per])
+        else:
+            moviePath = os.path.join(rootPath, 'performancevideo', dataGroup[index_cur][videoAlise_per] + '.avi')
         # print(moviePath)
         # movie = Movie_MP4(r'E:\之江\pattern\sourrcevideo\00000001.mp4')
         try:
@@ -1216,7 +1252,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             try:
                 t = time.localtime()
                 file = os.path.join(rootPath,
-                                    '词目动作原语模板标注工具 关键字段表格' + '_' + str(t.tm_mon) + '_' + str(t.tm_mday) + '.xls')
+                                    '词目动作原语模板分类标注工具' + '_' + self.lineEdit_operater.text() + '_' + str(t.tm_mon) + '_' + str(t.tm_mday) + '.xls')
                 workbook.save(file)
             except:
                 qmessagebox.warning(self, '警告', '文件保存失败,请检查姓名、日期、表格是否被占用')
@@ -1224,6 +1260,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             # self.load()
             qmessagebox.about(self, '输出文件', '输出成功')
 
+    def hint(self):
+        self.hin = HintWindow()
+        self.hin.showDialog()
 
 
 if __name__ == '__main__':
