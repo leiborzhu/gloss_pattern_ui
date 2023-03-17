@@ -280,12 +280,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.set_box_able(False)
             self.set_all_able(False)
 
+        global saveCon
+        saveCon = 0
+        self.label_save_condi.setText('未保存')
     # 更新界面，数据状态
     def refresh(self, index_cur):
 
         global saveCon
         global rem_tmp
         saveCon = 0
+        self.label_save_condi.setText('未保存')
         lineCur = dataGroup[index_cur]
 
         self.label_gloss.setText(str(lineCur[glossAlise]))
@@ -961,6 +965,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             qmessagebox.warning(self, '警告', '没有下一个词')
             return
         index_cur += 1
+        global saveCon
+        saveCon = 1
 
         self.refresh(index_cur)
 
@@ -1229,8 +1235,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.label_save_condi.setText('未保存')
 
     def readme(self):
+        global saveCon
+        saveCon = 0
+        self.label_save_condi.setText('未保存')
         self.dia = DialogWindow()
         self.dia.showDialog()
+
+
 
     def output(self):
         qmessagebox = QMessageBox()
