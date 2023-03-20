@@ -267,11 +267,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_L_1.setText(str(int(lineCur[fadeOutAlise_L_1])))
             else:
                 self.checkBox_L_1.setChecked(0)
-                self.lineEdit_pattern_index_L_1.setText('')
-                self.lineEdit_pattern_start_L_1.setText('')
-                self.lineEdit_pattern_end_L_1.setText('')
-                self.lineEdit_pattern_fade_in_L_1.setText('')
-                self.lineEdit_pattern_fade_out_L_1.setText('')
+                self.clearBox('L', 1)
+
             self.set_L_1_able()
 
             if str(lineCur[patterAlise_L_2]) != '':
@@ -284,11 +281,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_L_2.setText(str(int(lineCur[fadeOutAlise_L_2])))
             else:
                 self.checkBox_L_2.setChecked(0)
-                self.lineEdit_pattern_index_L_2.setText('')
-                self.lineEdit_pattern_start_L_2.setText('')
-                self.lineEdit_pattern_end_L_2.setText('')
-                self.lineEdit_pattern_fade_in_L_2.setText('')
-                self.lineEdit_pattern_fade_out_L_2.setText('')
+                self.clearBox('L', 2)
+
             self.set_L_2_able()
 
             if str(lineCur[patterAlise_L_3]) != '':
@@ -301,11 +295,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_L_3.setText(str(int(lineCur[fadeOutAlise_L_3])))
             else:
                 self.checkBox_L_3.setChecked(0)
-                self.lineEdit_pattern_index_L_3.setText('')
-                self.lineEdit_pattern_start_L_3.setText('')
-                self.lineEdit_pattern_end_L_3.setText('')
-                self.lineEdit_pattern_fade_in_L_3.setText('')
-                self.lineEdit_pattern_fade_out_L_3.setText('')
+                self.clearBox('L', 3)
+
             self.set_L_3_able()
 
             if str(lineCur[patterAlise_L_4]) != '':
@@ -318,11 +309,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_L_4.setText(str(int(lineCur[fadeOutAlise_L_4])))
             else:
                 self.checkBox_L_4.setChecked(0)
-                self.lineEdit_pattern_index_L_4.setText('')
-                self.lineEdit_pattern_start_L_4.setText('')
-                self.lineEdit_pattern_end_L_4.setText('')
-                self.lineEdit_pattern_fade_in_L_4.setText('')
-                self.lineEdit_pattern_fade_out_L_4.setText('')
+                self.clearBox('L', 4)
+
             self.set_L_4_able()
 
             if str(lineCur[patterAlise_R_1]) != '':
@@ -335,11 +323,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_R_1.setText(str(int(lineCur[fadeOutAlise_R_1])))
             else:
                 self.checkBox_R_1.setChecked(0)
-                self.lineEdit_pattern_index_R_1.setText('')
-                self.lineEdit_pattern_start_R_1.setText('')
-                self.lineEdit_pattern_end_R_1.setText('')
-                self.lineEdit_pattern_fade_in_R_1.setText('')
-                self.lineEdit_pattern_fade_out_R_1.setText('')
+                self.clearBox('R', 1)
+
             self.set_R_1_able()
 
             if str(lineCur[patterAlise_R_2]) != '':
@@ -352,11 +337,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_R_2.setText(str(int(lineCur[fadeOutAlise_R_2])))
             else:
                 self.checkBox_R_2.setChecked(0)
-                self.lineEdit_pattern_index_R_2.setText('')
-                self.lineEdit_pattern_start_R_2.setText('')
-                self.lineEdit_pattern_end_R_2.setText('')
-                self.lineEdit_pattern_fade_in_R_2.setText('')
-                self.lineEdit_pattern_fade_out_R_2.setText('')
+                self.clearBox('R', 2)
+
             self.set_R_2_able()
 
             if str(lineCur[patterAlise_R_3]) != '':
@@ -369,11 +351,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_R_3.setText(str(int(lineCur[fadeOutAlise_R_3])))
             else:
                 self.checkBox_R_3.setChecked(0)
-                self.lineEdit_pattern_index_R_3.setText('')
-                self.lineEdit_pattern_start_R_3.setText('')
-                self.lineEdit_pattern_end_R_3.setText('')
-                self.lineEdit_pattern_fade_in_R_3.setText('')
-                self.lineEdit_pattern_fade_out_R_3.setText('')
+                self.clearBox('R', 3)
+
             self.set_R_3_able()
 
             if str(lineCur[patterAlise_R_4]) != '':
@@ -386,11 +365,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.lineEdit_pattern_fade_out_R_4.setText(str(int(lineCur[fadeOutAlise_R_4])))
             else:
                 self.checkBox_R_4.setChecked(0)
-                self.lineEdit_pattern_index_R_4.setText('')
-                self.lineEdit_pattern_start_R_4.setText('')
-                self.lineEdit_pattern_end_R_4.setText('')
-                self.lineEdit_pattern_fade_in_R_4.setText('')
-                self.lineEdit_pattern_fade_out_R_4.setText('')
+                self.clearBox('R', 4)
+
             self.set_R_4_able()
 
         if str(lineCur[isCorrectAlise]) != '':
