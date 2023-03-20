@@ -182,55 +182,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.checkBox_R_4.setChecked(con)
 
     def set_all_able(self, con: bool):
-        self.lineEdit_pattern_index_L_1.setEnabled(con)
-        self.lineEdit_pattern_index_L_2.setEnabled(con)
-        self.lineEdit_pattern_index_L_3.setEnabled(con)
-        self.lineEdit_pattern_index_L_4.setEnabled(con)
+        self.set_L_1_able_all(con)
+        self.set_L_2_able_all(con)
+        self.set_L_3_able_all(con)
+        self.set_L_4_able_all(con)
 
-        self.lineEdit_pattern_index_R_1.setEnabled(con)
-        self.lineEdit_pattern_index_R_2.setEnabled(con)
-        self.lineEdit_pattern_index_R_3.setEnabled(con)
-        self.lineEdit_pattern_index_R_4.setEnabled(con)
-
-        self.lineEdit_pattern_end_L_1.setEnabled(con)
-        self.lineEdit_pattern_end_L_2.setEnabled(con)
-        self.lineEdit_pattern_end_L_3.setEnabled(con)
-        self.lineEdit_pattern_end_L_4.setEnabled(con)
-
-        self.lineEdit_pattern_end_R_1.setEnabled(con)
-        self.lineEdit_pattern_end_R_2.setEnabled(con)
-        self.lineEdit_pattern_end_R_3.setEnabled(con)
-        self.lineEdit_pattern_end_R_4.setEnabled(con)
-
-        self.lineEdit_pattern_fade_out_L_1.setEnabled(con)
-        self.lineEdit_pattern_fade_out_L_2.setEnabled(con)
-        self.lineEdit_pattern_fade_out_L_3.setEnabled(con)
-        self.lineEdit_pattern_fade_out_L_4.setEnabled(con)
-
-        self.lineEdit_pattern_fade_out_R_1.setEnabled(con)
-        self.lineEdit_pattern_fade_out_R_2.setEnabled(con)
-        self.lineEdit_pattern_fade_out_R_3.setEnabled(con)
-        self.lineEdit_pattern_fade_out_R_4.setEnabled(con)
-
-        self.lineEdit_pattern_fade_in_L_1.setEnabled(con)
-        self.lineEdit_pattern_fade_in_L_2.setEnabled(con)
-        self.lineEdit_pattern_fade_in_L_3.setEnabled(con)
-        self.lineEdit_pattern_fade_in_L_4.setEnabled(con)
-
-        self.lineEdit_pattern_fade_in_R_1.setEnabled(con)
-        self.lineEdit_pattern_fade_in_R_2.setEnabled(con)
-        self.lineEdit_pattern_fade_in_R_3.setEnabled(con)
-        self.lineEdit_pattern_fade_in_R_4.setEnabled(con)
-
-        self.lineEdit_pattern_start_L_1.setEnabled(con)
-        self.lineEdit_pattern_start_L_2.setEnabled(con)
-        self.lineEdit_pattern_start_L_3.setEnabled(con)
-        self.lineEdit_pattern_start_L_4.setEnabled(con)
-
-        self.lineEdit_pattern_start_R_1.setEnabled(con)
-        self.lineEdit_pattern_start_R_2.setEnabled(con)
-        self.lineEdit_pattern_start_R_3.setEnabled(con)
-        self.lineEdit_pattern_start_R_4.setEnabled(con)
+        self.set_R_1_able_all(con)
+        self.set_R_2_able_all(con)
+        self.set_R_3_able_all(con)
+        self.set_R_4_able_all(con)
 
     def set_changeBox_able_R(self):
         if self.checkBox_R_1.isChecked():
@@ -1075,6 +1035,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def open_video_res(self):
         qmessagebox = QMessageBox()
+
         class Video(object):
             def __init__(self, path):
                 self.path = path
@@ -1085,7 +1046,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         class Movie_MP4(Video):
             type = 'MP4'  # 此处以MP4格式为例
-
 
         moviePath = os.path.join(rootPath, 'sourrcevideo', str(int(dataGroup[index_cur][videoAlise_res])) + '.mp4')
         # print(rootPath)
@@ -1099,6 +1059,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def open_video_pre(self):
         qmessagebox = QMessageBox()
+
         class Video(object):
             def __init__(self, path):
                 self.path = path
@@ -1303,8 +1264,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.label_save_condi.setText('未保存')
         self.dia = DialogWindow()
         self.dia.showDialog()
-
-
 
     def output(self):
         qmessagebox = QMessageBox()
