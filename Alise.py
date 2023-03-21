@@ -52,10 +52,12 @@ max_frameAlise = 'frame_num'
 
 videoAlise_res = 'sourevideo_dir'
 videoAlise_per = 'performancevideo_dir'
+videoAlise_aft = 'repaired_videos'
 remarkAlise = 'remark'
 dateAlise = 'data(日期）'
 operatorAlise = 'operator（标记员)'
 describeAlise = 'describe'
+
 
 optional_label = [patterAlise_L_1, fadeInAlise_L_1, startAlise_L_1, endAlise_L_1, fadeOutAlise_L_1,
                   patterAlise_L_2, fadeInAlise_L_2, startAlise_L_2, endAlise_L_2, fadeOutAlise_L_2,

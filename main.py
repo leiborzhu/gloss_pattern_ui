@@ -263,7 +263,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             else:
                 self.radioButton_4.setChecked(1)
                 self.clearAll()
-        
+
         else:
             self.radioButton_4.setChecked(1)
             self.clearAll()
