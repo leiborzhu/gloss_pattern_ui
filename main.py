@@ -89,7 +89,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.pushButton_load.clicked.connect(self.load)
         self.pushButton_save.clicked.connect(self.save)
         self.pushButton_video_res.clicked.connect(self.open_video_res)
-        self.pushButton_video_per.clicked.connect(self.open_video_pre)
+        self.pushButton_video_after.clicked.connect(self.open_video_after)
         self.pushButton_readme.clicked.connect(self.readme)
         self.pushButton_output.clicked.connect(self.output)
         self.pushButton_hint.clicked.connect(self.hint)
@@ -108,56 +108,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.checkBox_R_3.clicked.connect(self.set_R_3_able)
         self.checkBox_R_4.clicked.connect(self.set_R_4_able)
 
-        def connectCondiChange():
-            self.lineEdit_pattern_start_L_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_L_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_L_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_L_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_L_1.textChanged.connect(self.saveCondiChange)
-
-            self.lineEdit_pattern_start_L_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_L_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_L_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_L_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_L_2.textChanged.connect(self.saveCondiChange)
-
-            self.lineEdit_pattern_start_L_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_L_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_L_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_L_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_L_3.textChanged.connect(self.saveCondiChange)
-
-            self.lineEdit_pattern_start_L_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_L_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_L_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_L_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_L_4.textChanged.connect(self.saveCondiChange)
-
-            self.lineEdit_pattern_start_R_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_R_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_R_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_R_1.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_R_1.textChanged.connect(self.saveCondiChange)
-
-            self.lineEdit_pattern_start_R_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_R_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_R_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_R_2.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_R_2.textChanged.connect(self.saveCondiChange)
-
-            self.lineEdit_pattern_start_R_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_R_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_R_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_R_3.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_R_3.textChanged.connect(self.saveCondiChange)
-
-            self.lineEdit_pattern_start_R_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_index_R_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_end_R_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_out_R_4.textChanged.connect(self.saveCondiChange)
-            self.lineEdit_pattern_fade_in_R_4.textChanged.connect(self.saveCondiChange)
-
-        connectCondiChange()
+        boxGroup = ['start', 'index', 'end', 'fade_out', 'fade_in']
+        for strHand in ['L', 'R']:
+            for index in range(1, 5):
+                for strBox in boxGroup:
+                    exec('self.lineEdit_pattern_' + strBox + '_' + strHand + '_' + str(index) + \
+                         '.textChanged.connect(self.saveCondiChange)')
+        '''
+        self.lineEdit_pattern_start_L_1.textChanged.connect(self.saveCondiChange)
+        .....................
+        '''
 
     def set_box_able(self, con: bool):
         self.checkBox_L_1.setEnabled(con)
@@ -218,24 +178,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.checkBox_R_1.setEnabled(1)
             self.set_link_able_R()
             self.set_link_able_L()
+            for strHand in ['L', 'R']:
+                for index in range(1, 5):
+                    if eval('str(self.lineEdit_pattern_index_' + strHand + '_' + str(index) +
+                            '.text()) != "" and self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
+                        exec('self.set_' + strHand + '_' + str(index) + '_able_all(True)')
+            '''
             if str(self.lineEdit_pattern_index_L_1.text()) != '' and self.checkBox_L_1.isChecked():
-                self.set_L_1_able_all(1)
-            if str(self.lineEdit_pattern_index_L_2.text()) != '' and self.checkBox_L_2.isChecked():
-                self.set_L_2_able_all(1)
-            if str(self.lineEdit_pattern_index_L_3.text()) != '' and self.checkBox_L_3.isChecked():
-                self.set_L_3_able_all(1)
-            if str(self.lineEdit_pattern_index_L_4.text()) != '' and self.checkBox_L_4.isChecked():
-                self.set_L_4_able_all(1)
-
-            if str(self.lineEdit_pattern_index_R_1.text()) != '' and self.checkBox_R_1.isChecked():
-                self.set_R_1_able_all(1)
-            if str(self.lineEdit_pattern_index_R_2.text()) != '' and self.checkBox_R_2.isChecked():
-                self.set_R_2_able_all(1)
-            if str(self.lineEdit_pattern_index_R_3.text()) != '' and self.checkBox_R_3.isChecked():
-                self.set_R_3_able_all(1)
-            if str(self.lineEdit_pattern_index_R_4.text()) != '' and self.checkBox_R_4.isChecked():
-                self.set_R_4_able_all(1)
-
+                self.set_L_1_able_all(True)
+                .........................
+            '''
         else:
             self.set_box_able(False)
             self.set_all_able(False)
@@ -256,7 +208,28 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.label_gloss_index.setText(str(int(lineCur[indexAlise])))
         rem_tmp = lineCur[remarkAlise]
 
+        # 根据数据更新界面
         def contUpdate():
+            lineCur = dataGroup[index_cur]
+            alsGroup = ['patterAlise', 'startAlise', 'endAlise', 'fadeInAlise', 'fadeOutAlise']
+            boxGroup = ['index', 'start', 'end', 'fade_in', 'fade_out']
+            for strHand in ['L', 'R']:
+                for index in range(1, 5):
+
+                    checkLine = 'str(lineCur[patterAlise_' + strHand + '_' + str(index) + ']) != ""'
+                    if eval(checkLine):
+                        exec('self.checkBox_' + strHand + '_' + str(index) + '.setChecked(1)')
+                        exec('self.checkBox_' + strHand + '_' + str(index) + '.setEnabled(1)')
+                        for i in range(len(alsGroup)):
+                            line = 'self.lineEdit_pattern_' + boxGroup[i] + '_' + strHand + '_' + str(index) + \
+                                   '.setText(str(int(lineCur[' + alsGroup[i] + '_' + strHand + '_' + str(index) + '])))'
+                            # print(line)
+                            exec(line)
+                    else:
+                        exec('self.checkBox_' + strHand + '_' + str(index) + '.setChecked(0)')
+                        self.clearBox(strHand, index)
+                    exec('self.set_' + strHand + '_' + str(index) + '_able()')
+            '''
             if str(lineCur[patterAlise_L_1]) != '':
                 self.checkBox_L_1.setChecked(1)
                 self.checkBox_L_1.setEnabled(1)
@@ -270,105 +243,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.clearBox('L', 1)
 
             self.set_L_1_able()
-
-            if str(lineCur[patterAlise_L_2]) != '':
-                self.checkBox_L_2.setChecked(1)
-                self.checkBox_L_2.setEnabled(1)
-                self.lineEdit_pattern_index_L_2.setText(str(int(lineCur[patterAlise_L_2])))
-                self.lineEdit_pattern_start_L_2.setText(str(int(lineCur[startAlise_L_2])))
-                self.lineEdit_pattern_end_L_2.setText(str(int(lineCur[endAlise_L_2])))
-                self.lineEdit_pattern_fade_in_L_2.setText(str(int(lineCur[fadeInAlise_L_2])))
-                self.lineEdit_pattern_fade_out_L_2.setText(str(int(lineCur[fadeOutAlise_L_2])))
-            else:
-                self.checkBox_L_2.setChecked(0)
-                self.clearBox('L', 2)
-
-            self.set_L_2_able()
-
-            if str(lineCur[patterAlise_L_3]) != '':
-                self.checkBox_L_3.setChecked(1)
-                self.checkBox_L_3.setEnabled(1)
-                self.lineEdit_pattern_index_L_3.setText(str(int(lineCur[patterAlise_L_3])))
-                self.lineEdit_pattern_start_L_3.setText(str(int(lineCur[startAlise_L_3])))
-                self.lineEdit_pattern_end_L_3.setText(str(int(lineCur[endAlise_L_3])))
-                self.lineEdit_pattern_fade_in_L_3.setText(str(int(lineCur[fadeInAlise_L_3])))
-                self.lineEdit_pattern_fade_out_L_3.setText(str(int(lineCur[fadeOutAlise_L_3])))
-            else:
-                self.checkBox_L_3.setChecked(0)
-                self.clearBox('L', 3)
-
-            self.set_L_3_able()
-
-            if str(lineCur[patterAlise_L_4]) != '':
-                self.checkBox_L_4.setChecked(1)
-                self.checkBox_L_4.setEnabled(1)
-                self.lineEdit_pattern_index_L_4.setText(str(int(lineCur[patterAlise_L_4])))
-                self.lineEdit_pattern_start_L_4.setText(str(int(lineCur[startAlise_L_4])))
-                self.lineEdit_pattern_end_L_4.setText(str(int(lineCur[endAlise_L_4])))
-                self.lineEdit_pattern_fade_in_L_4.setText(str(int(lineCur[fadeInAlise_L_4])))
-                self.lineEdit_pattern_fade_out_L_4.setText(str(int(lineCur[fadeOutAlise_L_4])))
-            else:
-                self.checkBox_L_4.setChecked(0)
-                self.clearBox('L', 4)
-
-            self.set_L_4_able()
-
-            if str(lineCur[patterAlise_R_1]) != '':
-                self.checkBox_R_1.setChecked(1)
-                self.checkBox_R_1.setEnabled(1)
-                self.lineEdit_pattern_index_R_1.setText(str(int(lineCur[patterAlise_R_1])))
-                self.lineEdit_pattern_start_R_1.setText(str(int(lineCur[startAlise_R_1])))
-                self.lineEdit_pattern_end_R_1.setText(str(int(lineCur[endAlise_R_1])))
-                self.lineEdit_pattern_fade_in_R_1.setText(str(int(lineCur[fadeInAlise_R_1])))
-                self.lineEdit_pattern_fade_out_R_1.setText(str(int(lineCur[fadeOutAlise_R_1])))
-            else:
-                self.checkBox_R_1.setChecked(0)
-                self.clearBox('R', 1)
-
-            self.set_R_1_able()
-
-            if str(lineCur[patterAlise_R_2]) != '':
-                self.checkBox_R_2.setChecked(1)
-                self.checkBox_R_2.setEnabled(1)
-                self.lineEdit_pattern_index_R_2.setText(str(int(lineCur[patterAlise_R_2])))
-                self.lineEdit_pattern_start_R_2.setText(str(int(lineCur[startAlise_R_2])))
-                self.lineEdit_pattern_end_R_2.setText(str(int(lineCur[endAlise_R_2])))
-                self.lineEdit_pattern_fade_in_R_2.setText(str(int(lineCur[fadeInAlise_R_2])))
-                self.lineEdit_pattern_fade_out_R_2.setText(str(int(lineCur[fadeOutAlise_R_2])))
-            else:
-                self.checkBox_R_2.setChecked(0)
-                self.clearBox('R', 2)
-
-            self.set_R_2_able()
-
-            if str(lineCur[patterAlise_R_3]) != '':
-                self.checkBox_R_3.setChecked(1)
-                self.checkBox_R_3.setEnabled(1)
-                self.lineEdit_pattern_index_R_3.setText(str(int(lineCur[patterAlise_R_3])))
-                self.lineEdit_pattern_start_R_3.setText(str(int(lineCur[startAlise_R_3])))
-                self.lineEdit_pattern_end_R_3.setText(str(int(lineCur[endAlise_R_3])))
-                self.lineEdit_pattern_fade_in_R_3.setText(str(int(lineCur[fadeInAlise_R_3])))
-                self.lineEdit_pattern_fade_out_R_3.setText(str(int(lineCur[fadeOutAlise_R_3])))
-            else:
-                self.checkBox_R_3.setChecked(0)
-                self.clearBox('R', 3)
-
-            self.set_R_3_able()
-
-            if str(lineCur[patterAlise_R_4]) != '':
-                self.checkBox_R_4.setChecked(1)
-                self.checkBox_R_4.setEnabled(1)
-                self.lineEdit_pattern_index_R_4.setText(str(int(lineCur[patterAlise_R_4])))
-                self.lineEdit_pattern_start_R_4.setText(str(int(lineCur[startAlise_R_4])))
-                self.lineEdit_pattern_end_R_4.setText(str(int(lineCur[endAlise_R_4])))
-                self.lineEdit_pattern_fade_in_R_4.setText(str(int(lineCur[fadeInAlise_R_4])))
-                self.lineEdit_pattern_fade_out_R_4.setText(str(int(lineCur[fadeOutAlise_R_4])))
-            else:
-                self.checkBox_R_4.setChecked(0)
-                self.clearBox('R', 4)
-
-            self.set_R_4_able()
-
+            ..................
+            '''
         if str(lineCur[isCorrectAlise]) != '':
             if int(lineCur[isCorrectAlise] == 1):
                 contUpdate()
@@ -379,12 +255,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             elif int(lineCur[isCorrectAlise] == 2):
                 self.radioButton_2.setChecked(1)
                 self.clearAll()
+
             elif int(lineCur[isCorrectAlise] == 3):
                 self.radioButton_3.setChecked(1)
                 self.clearAll()
+
             else:
                 self.radioButton_4.setChecked(1)
                 self.clearAll()
+        
         else:
             self.radioButton_4.setChecked(1)
             self.clearAll()
@@ -441,7 +320,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.pushButton_prev.setEnabled(1)
             self.pushButton_next.setEnabled(1)
             self.pushButton_video_res.setEnabled(1)
-            self.pushButton_video_per.setEnabled(1)
+            self.pushButton_video_after.setEnabled(1)
             self.pushButton_output.setEnabled(1)
             self.pushButton_toIndex.setEnabled(1)
             self.pushButton_readme.setEnabled(1)
@@ -483,6 +362,22 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.set_box_able(0)
 
         def allupdate():
+            aliseGroup = ['patterAlise', 'startAlise', 'endAlise', 'fadeInAlise', 'fadeOutAlise']
+            boxGroup = ['index', 'start', 'end', 'fade_in', 'fade_out']
+            for handStr in ['L', 'R']:
+                for index in range(1, 5):
+                    for i in range(len(aliseGroup)):
+                        line1 = 'dataGroup[index_cur][' + aliseGroup[i] + '_' + handStr + '_' + str(index) + ']'
+                        lineCheck = 'self.checkBox_' + handStr + '_' + str(index) + '.isChecked()'
+                        if eval(lineCheck):
+                            line2 = '=float(self.lineEdit_pattern_' + boxGroup[i] + '_' + handStr + '_' + \
+                                    str(index) + '.text())'
+                        else:
+                            line2 = "=''"
+                            self.clearBox(handStr, index)
+
+                        exec(line1 + line2)
+            '''        
             if self.checkBox_L_1.isChecked():
                 dataGroup[index_cur][patterAlise_L_1] = float(self.lineEdit_pattern_index_L_1.text())
                 dataGroup[index_cur][startAlise_L_1] = float(self.lineEdit_pattern_start_L_1.text())
@@ -491,110 +386,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 dataGroup[index_cur][fadeOutAlise_L_1] = float(self.lineEdit_pattern_fade_out_L_1.text())
             else:
                 dataGroup[index_cur][patterAlise_L_1] = ''
-                dataGroup[index_cur][startAlise_L_1] = ''
-                dataGroup[index_cur][endAlise_L_1] = ''
-                dataGroup[index_cur][fadeInAlise_L_1] = ''
-                dataGroup[index_cur][fadeOutAlise_L_1] = ''
+                .........
                 self.clearBox('L', 1)
-
-            if self.checkBox_L_2.isChecked():
-                dataGroup[index_cur][patterAlise_L_2] = float(self.lineEdit_pattern_index_L_2.text())
-                dataGroup[index_cur][startAlise_L_2] = float(self.lineEdit_pattern_start_L_2.text())
-                dataGroup[index_cur][endAlise_L_2] = float(self.lineEdit_pattern_end_L_2.text())
-                dataGroup[index_cur][fadeInAlise_L_2] = float(self.lineEdit_pattern_fade_in_L_2.text())
-                dataGroup[index_cur][fadeOutAlise_L_2] = float(self.lineEdit_pattern_fade_out_L_2.text())
-            else:
-                dataGroup[index_cur][patterAlise_L_2] = ''
-                dataGroup[index_cur][startAlise_L_2] = ''
-                dataGroup[index_cur][endAlise_L_2] = ''
-                dataGroup[index_cur][fadeInAlise_L_2] = ''
-                dataGroup[index_cur][fadeOutAlise_L_2] = ''
-                self.clearBox('L', 2)
-
-            if self.checkBox_L_3.isChecked():
-                dataGroup[index_cur][patterAlise_L_3] = float(self.lineEdit_pattern_index_L_3.text())
-                dataGroup[index_cur][startAlise_L_3] = float(self.lineEdit_pattern_start_L_3.text())
-                dataGroup[index_cur][endAlise_L_3] = float(self.lineEdit_pattern_end_L_3.text())
-                dataGroup[index_cur][fadeInAlise_L_3] = float(self.lineEdit_pattern_fade_in_L_3.text())
-                dataGroup[index_cur][fadeOutAlise_L_3] = float(self.lineEdit_pattern_fade_out_L_3.text())
-            else:
-                dataGroup[index_cur][patterAlise_L_3] = ''
-                dataGroup[index_cur][startAlise_L_3] = ''
-                dataGroup[index_cur][endAlise_L_3] = ''
-                dataGroup[index_cur][fadeInAlise_L_3] = ''
-                dataGroup[index_cur][fadeOutAlise_L_3] = ''
-                self.clearBox('L', 3)
-
-            if self.checkBox_L_4.isChecked():
-                dataGroup[index_cur][patterAlise_L_4] = float(self.lineEdit_pattern_index_L_4.text())
-                dataGroup[index_cur][startAlise_L_4] = float(self.lineEdit_pattern_start_L_4.text())
-                dataGroup[index_cur][endAlise_L_4] = float(self.lineEdit_pattern_end_L_4.text())
-                dataGroup[index_cur][fadeInAlise_L_4] = float(self.lineEdit_pattern_fade_in_L_4.text())
-                dataGroup[index_cur][fadeOutAlise_L_4] = float(self.lineEdit_pattern_fade_out_L_4.text())
-            else:
-                dataGroup[index_cur][patterAlise_L_4] = ''
-                dataGroup[index_cur][startAlise_L_4] = ''
-                dataGroup[index_cur][endAlise_L_4] = ''
-                dataGroup[index_cur][fadeInAlise_L_4] = ''
-                dataGroup[index_cur][fadeOutAlise_L_4] = ''
-                self.clearBox('L', 4)
-
-            if self.checkBox_R_1.isChecked():
-                dataGroup[index_cur][patterAlise_R_1] = float(self.lineEdit_pattern_index_R_1.text())
-                dataGroup[index_cur][startAlise_R_1] = float(self.lineEdit_pattern_start_R_1.text())
-                dataGroup[index_cur][endAlise_R_1] = float(self.lineEdit_pattern_end_R_1.text())
-                dataGroup[index_cur][fadeInAlise_R_1] = float(self.lineEdit_pattern_fade_in_R_1.text())
-                dataGroup[index_cur][fadeOutAlise_R_1] = float(self.lineEdit_pattern_fade_out_R_1.text())
-            else:
-                dataGroup[index_cur][patterAlise_R_1] = ''
-                dataGroup[index_cur][startAlise_R_1] = ''
-                dataGroup[index_cur][endAlise_R_1] = ''
-                dataGroup[index_cur][fadeInAlise_R_1] = ''
-                dataGroup[index_cur][fadeOutAlise_R_1] = ''
-                self.clearBox('R', 1)
-
-            if self.checkBox_R_2.isChecked():
-                dataGroup[index_cur][patterAlise_R_2] = float(self.lineEdit_pattern_index_R_2.text())
-                dataGroup[index_cur][startAlise_R_2] = float(self.lineEdit_pattern_start_R_2.text())
-                dataGroup[index_cur][endAlise_R_2] = float(self.lineEdit_pattern_end_R_2.text())
-                dataGroup[index_cur][fadeInAlise_R_2] = float(self.lineEdit_pattern_fade_in_R_2.text())
-                dataGroup[index_cur][fadeOutAlise_R_2] = float(self.lineEdit_pattern_fade_out_R_2.text())
-            else:
-                dataGroup[index_cur][patterAlise_R_2] = ''
-                dataGroup[index_cur][startAlise_R_2] = ''
-                dataGroup[index_cur][endAlise_R_2] = ''
-                dataGroup[index_cur][fadeInAlise_R_2] = ''
-                dataGroup[index_cur][fadeOutAlise_R_2] = ''
-                self.clearBox('R', 2)
-                
-            if self.checkBox_R_3.isChecked():
-                dataGroup[index_cur][patterAlise_R_3] = float(self.lineEdit_pattern_index_R_3.text())
-                dataGroup[index_cur][startAlise_R_3] = float(self.lineEdit_pattern_start_R_3.text())
-                dataGroup[index_cur][endAlise_R_3] = float(self.lineEdit_pattern_end_R_3.text())
-                dataGroup[index_cur][fadeInAlise_R_3] = float(self.lineEdit_pattern_fade_in_R_3.text())
-                dataGroup[index_cur][fadeOutAlise_R_3] = float(self.lineEdit_pattern_fade_out_R_3.text())
-            else:
-                dataGroup[index_cur][patterAlise_R_3] = ''
-                dataGroup[index_cur][startAlise_R_3] = ''
-                dataGroup[index_cur][endAlise_R_3] = ''
-                dataGroup[index_cur][fadeInAlise_R_3] = ''
-                dataGroup[index_cur][fadeOutAlise_R_3] = ''
-                self.clearBox('R', 3)
-            
-            if self.checkBox_R_4.isChecked():
-                dataGroup[index_cur][patterAlise_R_4] = float(self.lineEdit_pattern_index_R_4.text())
-                dataGroup[index_cur][startAlise_R_4] = float(self.lineEdit_pattern_start_R_4.text())
-                dataGroup[index_cur][endAlise_R_4] = float(self.lineEdit_pattern_end_R_4.text())
-                dataGroup[index_cur][fadeInAlise_R_4] = float(self.lineEdit_pattern_fade_in_R_4.text())
-                dataGroup[index_cur][fadeOutAlise_R_4] = float(self.lineEdit_pattern_fade_out_R_4.text())
-            else:
-                dataGroup[index_cur][patterAlise_R_4] = ''
-                dataGroup[index_cur][startAlise_R_4] = ''
-                dataGroup[index_cur][endAlise_R_4] = ''
-                dataGroup[index_cur][fadeInAlise_R_4] = ''
-                dataGroup[index_cur][fadeOutAlise_R_4] = ''
-                self.clearBox('R', 4)
-
+            ................
+                '''
         if self.radioButton_1.isChecked():
             dataGroup[index_cur][isCorrectAlise] = 1
             allupdate()
@@ -612,57 +407,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         dataGroup[index_cur][dateAlise] = str(t.tm_mon) + '_' + str(t.tm_mday)
 
     def clearBox(self, hand: str, index: int):
-        if hand == 'L':
-            if index == 1:
-                self.lineEdit_pattern_index_L_1.setText('')
-                self.lineEdit_pattern_start_L_1.setText('')
-                self.lineEdit_pattern_end_L_1.setText('')
-                self.lineEdit_pattern_fade_in_L_1.setText('')
-                self.lineEdit_pattern_fade_out_L_1.setText('')
-            elif index == 2:
-                self.lineEdit_pattern_index_L_2.setText('')
-                self.lineEdit_pattern_start_L_2.setText('')
-                self.lineEdit_pattern_end_L_2.setText('')
-                self.lineEdit_pattern_fade_in_L_2.setText('')
-                self.lineEdit_pattern_fade_out_L_2.setText('')
-            elif index == 3:
-                self.lineEdit_pattern_index_L_3.setText('')
-                self.lineEdit_pattern_start_L_3.setText('')
-                self.lineEdit_pattern_end_L_3.setText('')
-                self.lineEdit_pattern_fade_in_L_3.setText('')
-                self.lineEdit_pattern_fade_out_L_3.setText('')
-            elif index == 4:
-                self.lineEdit_pattern_index_L_4.setText('')
-                self.lineEdit_pattern_start_L_4.setText('')
-                self.lineEdit_pattern_end_L_4.setText('')
-                self.lineEdit_pattern_fade_in_L_4.setText('')
-                self.lineEdit_pattern_fade_out_L_4.setText('')
-        elif hand == 'R':
-            if index == 1:
-                self.lineEdit_pattern_index_R_1.setText('')
-                self.lineEdit_pattern_start_R_1.setText('')
-                self.lineEdit_pattern_end_R_1.setText('')
-                self.lineEdit_pattern_fade_in_R_1.setText('')
-                self.lineEdit_pattern_fade_out_R_1.setText('')
-            elif index == 2:
-                self.lineEdit_pattern_index_R_2.setText('')
-                self.lineEdit_pattern_start_R_2.setText('')
-                self.lineEdit_pattern_end_R_2.setText('')
-                self.lineEdit_pattern_fade_in_R_2.setText('')
-                self.lineEdit_pattern_fade_out_R_2.setText('')
-            elif index == 3:
-                self.lineEdit_pattern_index_R_3.setText('')
-                self.lineEdit_pattern_start_R_3.setText('')
-                self.lineEdit_pattern_end_R_3.setText('')
-                self.lineEdit_pattern_fade_in_R_3.setText('')
-                self.lineEdit_pattern_fade_out_R_3.setText('')
-            elif index == 4:
-                self.lineEdit_pattern_index_R_4.setText('')
-                self.lineEdit_pattern_start_R_4.setText('')
-                self.lineEdit_pattern_end_R_4.setText('')
-                self.lineEdit_pattern_fade_in_R_4.setText('')
-                self.lineEdit_pattern_fade_out_R_4.setText('')
-            
+        for strType in ['index', 'start', 'end', 'fade_in', 'fade_out']:
+            line = 'self.lineEdit_pattern_' + strType + '_' + hand + '_' + str(index) + r'.setText("")'
+            exec(line)
+
     def save(self):
         qmessagebox = QMessageBox()
 
@@ -828,9 +576,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         qmessagebox = QMessageBox()
 
         if self.checkBox_L_1.isChecked():
-
+            a = self.lineEdit_pattern_index_L_1.text()
+            b = type(self.lineEdit_pattern_index_L_1.text())
             blankCon_L_1_frame_valid = [
-                int(self.lineEdit_pattern_index_L_1.text()) < 1,
+                int(self.lineEdit_pattern_index_L_1.text().strip()) < 1,
                 int(self.lineEdit_pattern_index_L_1.text()) > 61,
                 int(self.lineEdit_pattern_fade_in_L_1.text()) < 0,
                 int(self.lineEdit_pattern_start_L_1.text()) <= int(self.lineEdit_pattern_fade_in_L_1.text()),
@@ -905,7 +654,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if sum(blankCon_R_1_frame_valid) != 0:
                 qmessagebox.warning(self, '警告', '动作R1帧数设置有误')
                 return False
-
 
         if self.checkBox_R_2.isChecked():
             blankCon_R_2_frame_valid = [
@@ -1033,7 +781,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             qmessagebox.warning(self, '警告', '视频打开失败')
             return
 
-    def open_video_pre(self):
+    def open_video_after(self):
         qmessagebox = QMessageBox()
 
         class Video(object):
@@ -1044,22 +792,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 from os import startfile
                 startfile(self.path, "open")
 
-        class Movie_AVI(Video):
-            type = 'AVI'  # 此处以MP4格式为例
+        class Movie_MP4(Video):
+            type = 'MP4'  # 此处以MP4格式为例
 
         def addZero(s: int) -> str:
             res = str(s)
             for _ in range(8 - len(str(s))):
                 res = '0' + res
             return res
-        if '.avi' in dataGroup[index_cur][videoAlise_per]:
-            moviePath = os.path.join(rootPath, 'performancevideo', dataGroup[index_cur][videoAlise_per])
-        else:
-            moviePath = os.path.join(rootPath, 'performancevideo', dataGroup[index_cur][videoAlise_per] + '.avi')
+        moviePath = os.path.join(rootPath, 'sourrcevideo', str(int(dataGroup[index_cur][videoAlise_aft])) + '.mp4')
         # print(moviePath)
         # movie = Movie_MP4(r'E:\之江\pattern\sourrcevideo\00000001.mp4')
         try:
-            movie = Movie_AVI(moviePath)
+            movie = Movie_MP4(moviePath)
             movie.play()
         except:
             qmessagebox.warning(self, '警告', '视频打开失败')
