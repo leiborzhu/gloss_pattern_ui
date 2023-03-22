@@ -23,16 +23,62 @@ from os import startfile
 import csv
 from Dialog import Ui_Dialog
 from Dialog_hint import Ui_Dialog_hint
+from Dialog_check import Ui_Dialog_proof
+
 dataBase = []
 key_label = []
 data_dict_oneLine = {}
 dataGroup = []
 saveCon = 0
 index_cur = 0
+indexDict = {}
 from Alise import *
 
 rootPath = os.path.dirname(os.path.realpath(sys.executable))
 rem_tmp = []
+
+
+class ProofWindow(QDialog, Ui_Dialog_proof):
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint)
+        self.setupUi(self)
+
+        self.pushButton_proof_yes.clicked.connect(self.yes)
+
+        self.errBox = [errHandAlise, errRetarAlise, errPerformAlise, errRestAlise]
+        for i in range(len(self.errBox)):
+            if dataGroup[index_cur][self.errBox[i]] != '' and dataGroup[index_cur][self.errBox[i]]:
+               exec('self.radioButton_res_' + str(i + 1) + '.setChecked(1)')
+        self.textEdit_proof.setText(dataGroup[index_cur]['proofremark'])
+
+    def yes(self):
+        qmessagebox = QMessageBox()
+        checkBox = [
+            self.radioButton_res_1.isChecked(),
+            self.radioButton_res_2.isChecked(),
+            self.radioButton_res_3.isChecked(),
+            self.radioButton_res_4.isChecked()
+        ]
+        if sum(checkBox) == 0:
+            qmessagebox.warning(self, '警告', '请至少选择一个理由')
+            return
+        if self.radioButton_res_4.isChecked() and self.textEdit_proof.toPlainText() == '':
+            qmessagebox.warning(self, '警告', '请写明相关理由')
+            return
+
+        for i in range(len(checkBox)):
+            if checkBox[i]:
+                dataGroup[index_cur][self.errBox[i]] = 1
+            else:
+                dataGroup[index_cur][self.errBox[i]] = 0
+
+        dataGroup[index_cur]['proofremark'] = self.textEdit_proof.toPlainText()
+        qmessagebox.warning(self, '警告', '设置成功，请注意保存')
+        self.close()
+
+    def showDialog(self):
+        self.show()
 
 
 class HintWindow(QDialog, Ui_Dialog_hint):
@@ -98,15 +144,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.radioButton_2.clicked.connect(self.set_change_able)
         self.radioButton_3.clicked.connect(self.set_change_able)
 
+        for strHand in ['L', 'R']:
+            for index in range(1, 5):
+                exec('self.checkBox_' + strHand + '_' + str(index) + '.clicked.connect(self.set_' + strHand + '_' + str(index) + '_able)')
+        '''
         self.checkBox_L_1.clicked.connect(self.set_L_1_able)
-        self.checkBox_L_2.clicked.connect(self.set_L_2_able)
-        self.checkBox_L_3.clicked.connect(self.set_L_3_able)
-        self.checkBox_L_4.clicked.connect(self.set_L_4_able)
+        ...................
+        '''
 
-        self.checkBox_R_1.clicked.connect(self.set_R_1_able)
-        self.checkBox_R_2.clicked.connect(self.set_R_2_able)
-        self.checkBox_R_3.clicked.connect(self.set_R_3_able)
-        self.checkBox_R_4.clicked.connect(self.set_R_4_able)
+        self.checkBox_checkMode.clicked.connect(self.changeMode)
 
         boxGroup = ['start', 'index', 'end', 'fade_out', 'fade_in']
         for strHand in ['L', 'R']:
@@ -173,24 +219,44 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     # 选择是否修改时改变状态
     def set_change_able(self):
-        if self.radioButton_1.isChecked():
-            self.checkBox_L_1.setEnabled(1)
-            self.checkBox_R_1.setEnabled(1)
-            self.set_link_able_R()
-            self.set_link_able_L()
-            for strHand in ['L', 'R']:
-                for index in range(1, 5):
-                    if eval('str(self.lineEdit_pattern_index_' + strHand + '_' + str(index) +
-                            '.text()) != "" and self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
-                        exec('self.set_' + strHand + '_' + str(index) + '_able_all(True)')
-            '''
-            if str(self.lineEdit_pattern_index_L_1.text()) != '' and self.checkBox_L_1.isChecked():
-                self.set_L_1_able_all(True)
-                .........................
-            '''
+        if self.checkBox_checkMode.isChecked():
+            self.checkBox_L_1.setEnabled(True)
+            self.checkBox_R_1.setEnabled(True)
+            if self.radioButton_1.isChecked():
+                self.set_link_able_R()
+                self.set_link_able_L()
+                for strHand in ['L', 'R']:
+                    for index in range(1, 5):
+                        if eval('self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
+                            exec('self.set_' + strHand + '_' + str(index) + '_able_all(True)')
+                '''
+                if self.checkBox_L_1.isChecked():
+                    self.set_L_1_able_all(True)
+                ...................
+                '''
+            else:
+                self.set_box_able(False)
+                self.set_all_able(False)
+
         else:
-            self.set_box_able(False)
-            self.set_all_able(False)
+            if self.radioButton_1.isChecked():
+                self.checkBox_L_1.setEnabled(1)
+                self.checkBox_R_1.setEnabled(1)
+                self.set_link_able_R()
+                self.set_link_able_L()
+                for strHand in ['L', 'R']:
+                    for index in range(1, 5):
+                        if eval('str(self.lineEdit_pattern_index_' + strHand + '_' + str(index) +
+                                '.text()) != "" and self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
+                            exec('self.set_' + strHand + '_' + str(index) + '_able_all(True)')
+                '''
+                if str(self.lineEdit_pattern_index_L_1.text()) != '' and self.checkBox_L_1.isChecked():
+                    self.set_L_1_able_all(True)
+                    .........................
+                '''
+            else:
+                self.set_box_able(False)
+                self.set_all_able(False)
 
         global saveCon
         saveCon = 0
@@ -245,28 +311,41 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.set_L_1_able()
             ..................
             '''
-        if str(lineCur[isCorrectAlise]) != '':
-            if int(lineCur[isCorrectAlise] == 1):
-                contUpdate()
-                self.radioButton_1.setChecked(1)
-                self.checkBox_R_1.setEnabled(1)
-                self.checkBox_L_1.setEnabled(1)
+        def updateInputCon():
+            if str(lineCur[isCorrectAlise]) != '':
+                if int(lineCur[isCorrectAlise] == 1):
+                    contUpdate()
+                    self.radioButton_1.setChecked(1)
+                    self.checkBox_R_1.setEnabled(1)
+                    self.checkBox_L_1.setEnabled(1)
 
-            elif int(lineCur[isCorrectAlise] == 2):
-                self.radioButton_2.setChecked(1)
-                self.clearAll()
+                elif int(lineCur[isCorrectAlise] == 2):
+                    self.radioButton_2.setChecked(1)
+                    self.clearAll()
 
-            elif int(lineCur[isCorrectAlise] == 3):
+                else:
+                    self.radioButton_3.setChecked(1)
+                    self.clearAll()
+
+            else:
                 self.radioButton_3.setChecked(1)
                 self.clearAll()
 
+        if self.checkBox_checkMode.isChecked():
+            contUpdate()
+            if lineCur[isProofALise] == '':
+                self.radioButton_3.setChecked(1)
             else:
-                self.radioButton_4.setChecked(1)
-                self.clearAll()
-
+                if int(lineCur[isProofALise]) == 1:
+                    self.radioButton_1.setChecked(1)
+                elif int(lineCur[isProofALise]) == 2:
+                    self.radioButton_2.setChecked(1)
+                else:
+                    self.radioButton_3.setChecked(1)
+            self.set_change_able()
         else:
-            self.radioButton_4.setChecked(1)
-            self.clearAll()
+            updateInputCon()
+
 
     def load(self):
         qmessagebox = QMessageBox()
@@ -279,12 +358,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             qmessagebox.warning(self, '警告', '请输入操作员姓名')
             return
 
+        if self.lineEdit_reader.text() == '':
+            qmessagebox.warning(self, '警告', '请输入校对员姓名')
+            return
+
         # print(os.path.dirname(os.path.realpath(sys.executable)))
         filePathLoad = os.path.dirname(os.path.realpath(sys.executable))
-        name = self.lineEdit_operater.text().strip()
-
+        opName = self.lineEdit_operater.text().strip()
+        reName = self.lineEdit_reader.text().strip()
         file = os.path.join(rootPath,
-                            '词目动作原语模板分类标注工具_' + name + '.xls')
+                            '词目动作原语模板分类标注工具_' + opName + '_' + reName + '.xls')
         # file = 'D:\pattern\动作修复 词目标注工具\词目动作原语模板标注工具 关键字段表格.xls'  # 文件路径
         try:
             wb = xlrd.open_workbook(filename=file)  # 用方法打开该文件路径下的文件
@@ -311,6 +394,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for j in range(len(key_label)):
                 data_dict_line_tmp[key_label[j]] = dataBase[i][j]
             dataGroup.append(data_dict_line_tmp)
+            indexDict[str(int(dataGroup[i - 1][indexAlise]))] = i - 1
 
         index_cur = 0
         self.refresh(index_cur)
@@ -329,18 +413,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.radioButton_1.setEnabled(1)
             self.radioButton_2.setEnabled(1)
             self.radioButton_3.setEnabled(1)
-            self.radioButton_4.setEnabled(1)
 
             self.lineEdit_operater.setEnabled(0)
+            self.lineEdit_reader.setEnabled(0)
+
+            self.checkBox_checkMode.setEnabled(1)
 
         buttom_check()
 
         qmessagebox.about(self, '导入数据', '导入成功')
 
     def clearAll(self):
-        self.set_box_able(0)
-        self.set_all_able(0)
-        self.set_box_check(0)
+        self.set_box_able(False)
+        self.set_all_able(False)
+        self.set_box_check(False)
         for i in range(1, 5):
             self.clearBox('L', i)
             self.clearBox('R', i)
@@ -359,7 +445,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for i in key_label:
                 if i in optional_label:
                     dataGroup[index_cur][i] = ''
-                self.set_box_able(0)
+                self.set_box_able(False)
 
         def allupdate():
             aliseGroup = ['patterAlise', 'startAlise', 'endAlise', 'fadeInAlise', 'fadeOutAlise']
@@ -390,15 +476,23 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.clearBox('L', 1)
             ................
                 '''
-        if self.radioButton_1.isChecked():
-            dataGroup[index_cur][isCorrectAlise] = 1
-            allupdate()
-        elif self.radioButton_2.isChecked():
-            dataGroup[index_cur][isCorrectAlise] = 2
-            clear_and_load()
-        elif self.radioButton_3.isChecked():
-            dataGroup[index_cur][isCorrectAlise] = 3
-            clear_and_load()
+        if self.checkBox_checkMode.isChecked():
+            if self.radioButton_1.isChecked():
+                dataGroup[index_cur][isProofALise] = 1
+                allupdate()
+            elif self.radioButton_2.isChecked():
+                dataGroup[index_cur][isProofALise] = 2
+
+        else:
+            if self.radioButton_1.isChecked():
+                dataGroup[index_cur][isCorrectAlise] = 1
+                allupdate()
+            elif self.radioButton_2.isChecked():
+                dataGroup[index_cur][isCorrectAlise] = 2
+                clear_and_load()
+            elif self.radioButton_3.isChecked():
+                dataGroup[index_cur][isCorrectAlise] = 3
+                clear_and_load()
 
         dataGroup[index_cur][remarkAlise] = rem_tmp
 
@@ -431,17 +525,18 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
         rows = len(dataBase)
         lines = len(dataBase[0])
-        # print(rows)
+
         for i in range(rows):
             for j in range(lines):
                 if i != 0:
                     dataBase[i][j] = dataGroup[i - 1][key_label[j]]
                 ws.write(i, j, dataBase[i][j])
         try:
-            name = self.lineEdit_operater.text().strip()
-
+            opName = self.lineEdit_operater.text().strip()
+            reName = self.lineEdit_reader.text().strip()
             file = os.path.join(rootPath,
-                                '词目动作原语模板分类标注工具_' + name + '.xls')
+                                '词目动作原语模板分类标注工具_' + opName + '_' + reName + '.xls')
+
             workbook.save(file)
         except:
             qmessagebox.warning(self, '警告', '文件保存失败,请检查姓名、日期、表格是否被占用')
@@ -472,6 +567,24 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                     qmessagebox.warning(self, '警告', '请至少填入一个动作')
                     return False
         return True
+
+    def changeMode(self):
+        qmessagebox = QMessageBox()
+        if self.checkBox_checkMode.isChecked():
+            qmessagebox.warning(self, '提示', '进入校对模式')
+            self.radioButton_1.setText('需修改')
+            self.radioButton_2.setText('通过')
+            self.radioButton_3.setText('未校对')
+            self.pushButton_readme.setText('问题描述')
+
+        else:
+            qmessagebox.warning(self, '提示', '进入录入模式')
+            self.radioButton_1.setText('需修改')
+            self.radioButton_2.setText('不确定')
+            self.radioButton_3.setText('未处理')
+            self.pushButton_readme.setText('添加备注')
+
+        self.refresh(index_cur)
 
     def check_isnum_valid(self) -> bool:
         qmessagebox = QMessageBox()
@@ -740,19 +853,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if not index_tmp.isnumeric():
             qmessagebox.warning(self, '警告', '请输入数字编号')
             return
-        if int(index_tmp) > len(dataGroup) or int(index_tmp) < 1:
-            qmessagebox.warning(self, '警告', '超出序列范围')
+
+        if str(self.lineEdit_to_index.text()) not in indexDict.keys():
+            qmessagebox.warning(self, '警告', '无该编号对应的词')
             return
 
         if not self.saveConti():
             return
-        index_cur = int(index_tmp) - 1
+        index_cur = indexDict[self.lineEdit_to_index.text()]
 
         self.refresh(index_cur)
 
     def checkCon(self):
         qmessagebox = QMessageBox()
-        if self.radioButton_1.isChecked() + self.radioButton_2.isChecked() + self.radioButton_3.isChecked() == 0:
+        if self.radioButton_1.isChecked() + self.radioButton_2.isChecked() == 0:
             qmessagebox.warning(self, '警告', '请至少选择一项处理意见')
             return 0
         return 1
@@ -983,8 +1097,12 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         global saveCon
         saveCon = 0
         self.label_save_condi.setText('未保存')
-        self.dia = DialogWindow()
-        self.dia.showDialog()
+        if self.checkBox_checkMode.isChecked():
+            self.dia = ProofWindow()
+            self.dia.showDialog()
+        else:
+            self.dia = DialogWindow()
+            self.dia.showDialog()
 
     def output(self):
         qmessagebox = QMessageBox()

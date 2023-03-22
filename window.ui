@@ -838,29 +838,11 @@
      <rect>
       <x>950</x>
       <y>30</y>
-      <width>366</width>
+      <width>390</width>
       <height>80</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
-     <item row="1" column="1">
-      <widget class="QRadioButton" name="radioButton_4">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>未处理</string>
-       </property>
-       <property name="autoRepeat">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="1">
       <widget class="QRadioButton" name="radioButton_2">
        <property name="enabled">
@@ -872,7 +854,7 @@
         </font>
        </property>
        <property name="text">
-        <string>无需修改</string>
+        <string>不确定</string>
        </property>
        <property name="autoRepeat">
         <bool>true</bool>
@@ -908,7 +890,7 @@
         </font>
        </property>
        <property name="text">
-        <string>不确定</string>
+        <string>未处理</string>
        </property>
        <property name="autoRepeat">
         <bool>true</bool>
@@ -932,6 +914,33 @@
        </property>
        <property name="text">
         <string>查看提示</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QCheckBox" name="checkBox_checkMode">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>校对模式</string>
        </property>
       </widget>
      </item>
@@ -1109,7 +1118,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_pfReader">
+      <widget class="QLineEdit" name="lineEdit_reader">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>

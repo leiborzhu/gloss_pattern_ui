@@ -57,6 +57,12 @@ remarkAlise = 'remark'
 dateAlise = 'data(日期）'
 operatorAlise = 'operator（标记员)'
 describeAlise = 'describe'
+isProofALise = 'needchange'
+errHandAlise = 'ishandshape'
+errRetarAlise = 'isretargeting'
+errPerformAlise = 'iswrongperform'
+errRestAlise = 'isrest'
+
 
 
 optional_label = [patterAlise_L_1, fadeInAlise_L_1, startAlise_L_1, endAlise_L_1, fadeOutAlise_L_1,
