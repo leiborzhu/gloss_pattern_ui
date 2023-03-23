@@ -52,17 +52,18 @@ max_frameAlise = 'frame_num'
 
 videoAlise_res = 'sourevideo_dir'
 videoAlise_per = 'performancevideo_dir'
-videoAlise_aft = 'repaired_videos'
+videoAlise_aft = 'sourevideo_dir'
 remarkAlise = 'remark'
 dateAlise = 'data(日期）'
 operatorAlise = 'operator（标记员)'
+readerAlise = 'proofreader'
 describeAlise = 'describe'
 isProofALise = 'needchange'
 errHandAlise = 'ishandshape'
 errRetarAlise = 'isretargeting'
 errPerformAlise = 'iswrongperform'
 errRestAlise = 'isrest'
-
+videoConAlise = 'proofcondition'
 
 
 optional_label = [patterAlise_L_1, fadeInAlise_L_1, startAlise_L_1, endAlise_L_1, fadeOutAlise_L_1,

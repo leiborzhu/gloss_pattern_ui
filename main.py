@@ -50,32 +50,61 @@ class ProofWindow(QDialog, Ui_Dialog_proof):
         for i in range(len(self.errBox)):
             if dataGroup[index_cur][self.errBox[i]] != '' and dataGroup[index_cur][self.errBox[i]]:
                exec('self.radioButton_res_' + str(i + 1) + '.setChecked(1)')
+        if dataGroup[index_cur][videoConAlise] != '':
+            if int(dataGroup[index_cur][videoConAlise]) == 1:
+                self.radioButton_res_0.setChecked(True)
         self.textEdit_proof.setText(dataGroup[index_cur]['proofremark'])
+
+        self.radioButton_res_0.clicked.connect(self.exclude)
+        self.radioButton_res_1.clicked.connect(self.cancelCorrect)
+        self.radioButton_res_2.clicked.connect(self.cancelCorrect)
+        self.radioButton_res_3.clicked.connect(self.cancelCorrect)
+        self.radioButton_res_4.clicked.connect(self.cancelCorrect)
 
     def yes(self):
         qmessagebox = QMessageBox()
         checkBox = [
+            self.radioButton_res_0.isChecked(),
             self.radioButton_res_1.isChecked(),
             self.radioButton_res_2.isChecked(),
             self.radioButton_res_3.isChecked(),
             self.radioButton_res_4.isChecked()
         ]
         if sum(checkBox) == 0:
-            qmessagebox.warning(self, '警告', '请至少选择一个理由')
+            qmessagebox.warning(self, '警告', '请至少选择一个评价')
             return
+        if self.radioButton_res_0.isChecked():
+            dataGroup[index_cur][videoConAlise] = 1
+        else:
+            dataGroup[index_cur][videoConAlise] = 2
+
         if self.radioButton_res_4.isChecked() and self.textEdit_proof.toPlainText() == '':
             qmessagebox.warning(self, '警告', '请写明相关理由')
             return
 
-        for i in range(len(checkBox)):
-            if checkBox[i]:
+        for i in range(len(checkBox) - 1):
+            if checkBox[i + 1]:
                 dataGroup[index_cur][self.errBox[i]] = 1
             else:
                 dataGroup[index_cur][self.errBox[i]] = 0
+        if self.radioButton_res_4.isChecked():
+            dataGroup[index_cur]['proofremark'] = self.textEdit_proof.toPlainText()
+        else:
+            dataGroup[index_cur]['proofremark'] = ''
+            self.textEdit_proof.setText('')
 
-        dataGroup[index_cur]['proofremark'] = self.textEdit_proof.toPlainText()
         qmessagebox.warning(self, '警告', '设置成功，请注意保存')
         self.close()
+
+    def cancelCorrect(self):
+        self.radioButton_res_0.setChecked(False)
+
+    def exclude(self):
+        if self.radioButton_res_0.isChecked():
+            self.radioButton_res_1.setChecked(False)
+            self.radioButton_res_2.setChecked(False)
+            self.radioButton_res_3.setChecked(False)
+            self.radioButton_res_4.setChecked(False)
 
     def showDialog(self):
         self.show()
@@ -431,7 +460,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             self.clearBox('L', i)
             self.clearBox('R', i)
 
-    def dataUpdate(self):
+    def dataUpdate(self) -> bool:
         qmessagebox = QMessageBox()
         # 添加操作者
         if self.lineEdit_operater.text() == '':
@@ -439,7 +468,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             return
         else:
             dataGroup[index_cur][operatorAlise] = self.lineEdit_operater.text()
-
+        dataGroup[index_cur][readerAlise] = self.lineEdit_reader.text()
         def clear_and_load():
             self.clearAll()
             for i in key_label:
@@ -477,6 +506,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             ................
                 '''
         if self.checkBox_checkMode.isChecked():
+            if dataGroup[index_cur][videoConAlise] == '':
+                qmessagebox.warning(self, '警告', '请评估视频质量')
+                return False
+            if self.radioButton_3.isChecked():
+                qmessagebox.warning(self, '警告', '请校对标注结果')
+                return False
+
             if self.radioButton_1.isChecked():
                 dataGroup[index_cur][isProofALise] = 1
                 allupdate()
@@ -500,6 +536,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         t = time.localtime()
         dataGroup[index_cur][dateAlise] = str(t.tm_mon) + '_' + str(t.tm_mday)
 
+        return True
+
     def clearBox(self, hand: str, index: int):
         for strType in ['index', 'start', 'end', 'fade_in', 'fade_out']:
             line = 'self.lineEdit_pattern_' + strType + '_' + hand + '_' + str(index) + r'.setText("")'
@@ -514,7 +552,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if not self.check_isnum_valid():
             return
 
-        self.dataUpdate()
+        if not self.dataUpdate():
+            return
 
         # 检查需修改的情况下是否有动作信息
         if not self.check_isChecked():
@@ -573,9 +612,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         if self.checkBox_checkMode.isChecked():
             qmessagebox.warning(self, '提示', '进入校对模式')
             self.radioButton_1.setText('需修改')
-            self.radioButton_2.setText('通过')
+            self.radioButton_2.setText('标注通过')
             self.radioButton_3.setText('未校对')
-            self.pushButton_readme.setText('问题描述')
+            self.pushButton_readme.setText('视频评估')
 
         else:
             qmessagebox.warning(self, '提示', '进入录入模式')
@@ -687,135 +726,50 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def check_frame_valid(self) -> bool:
         qmessagebox = QMessageBox()
+        blankCon_frame_valid_tmp = []
+        for strHand in ['L', 'R']:
+            for index in range(1, 5):
+                if eval('self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
+                    blankCon_frame_valid_tmp = []
+                    exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_index_' +
+                         strHand + '_' + str(index) + '.text().strip()) < 1)')
+                    exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_index_' +
+                         strHand + '_' + str(index) + '.text().strip()) > 61)')
+                    exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_fade_in_' +
+                         strHand + '_' + str(index) + '.text().strip()) < 0)')
+                    exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_start_' +
+                         strHand + '_' + str(index) + '.text().strip()) <= int(self.lineEdit_pattern_fade_in_' +
+                         strHand + '_' + str(index) + '.text().strip()))')
+                    exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_end_' +
+                         strHand + '_' + str(index) + '.text().strip()) <= int(self.lineEdit_pattern_start_' +
+                         strHand + '_' + str(index) + '.text().strip()))')
+                    exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_fade_out_' +
+                         strHand + '_' + str(index) + '.text().strip()) <= int(self.lineEdit_pattern_end_' +
+                         strHand + '_' + str(index) + '.text().strip()))')
+                    exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_fade_out_' +
+                         strHand + '_' + str(index) + '.text().strip()) > dataGroup[index_cur][max_frameAlise])')
+                # print(blankCon_frame_valid_tmp)
+                if eval('sum(blankCon_frame_valid_tmp) != 0'):
+                    exec('qmessagebox.warning(self, "警告", "动作" + strHand + str(index) + "帧数设置有误")')
+                    return False
 
-        if self.checkBox_L_1.isChecked():
-            a = self.lineEdit_pattern_index_L_1.text()
-            b = type(self.lineEdit_pattern_index_L_1.text())
+        '''if self.checkBox_L_1.isChecked():
+
             blankCon_L_1_frame_valid = [
                 int(self.lineEdit_pattern_index_L_1.text().strip()) < 1,
-                int(self.lineEdit_pattern_index_L_1.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_L_1.text()) < 0,
-                int(self.lineEdit_pattern_start_L_1.text()) <= int(self.lineEdit_pattern_fade_in_L_1.text()),
-                int(self.lineEdit_pattern_end_L_1.text()) <= int(self.lineEdit_pattern_start_L_1.text()),
-                int(self.lineEdit_pattern_fade_out_L_1.text()) <= int(self.lineEdit_pattern_end_L_1.text()),
-                int(self.lineEdit_pattern_fade_out_L_1.text()) > dataGroup[index_cur][max_frameAlise]
+                int(self.lineEdit_pattern_index_L_1.text().strip()) > 61,
+                int(self.lineEdit_pattern_fade_in_L_1.text().strip()) < 0,
+                int(self.lineEdit_pattern_start_L_1.text().strip()) <= int(self.lineEdit_pattern_fade_in_L_1.text().strip()),
+                int(self.lineEdit_pattern_end_L_1.text().strip()) <= int(self.lineEdit_pattern_start_L_1.text().strip()),
+                int(self.lineEdit_pattern_fade_out_L_1.text().strip()) <= int(self.lineEdit_pattern_end_L_1.text().strip()),
+                int(self.lineEdit_pattern_fade_out_L_1.text().strip()) > dataGroup[index_cur][max_frameAlise]
             ]
 
             if sum(blankCon_L_1_frame_valid) != 0:
                 qmessagebox.warning(self, '警告', '动作L1帧数设置有误')
                 return False
-        if self.checkBox_L_2.isChecked():
-            blankCon_L_2_frame_valid = [
-                int(self.lineEdit_pattern_index_L_2.text()) < 1,
-                int(self.lineEdit_pattern_index_L_2.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_L_2.text()) < 0,
-                int(self.lineEdit_pattern_start_L_2.text()) <= int(self.lineEdit_pattern_fade_in_L_2.text()),
-                int(self.lineEdit_pattern_end_L_2.text()) <= int(self.lineEdit_pattern_start_L_2.text()),
-                int(self.lineEdit_pattern_fade_out_L_2.text()) <= int(self.lineEdit_pattern_end_L_2.text()),
-                int(self.lineEdit_pattern_fade_out_L_2.text()) > dataGroup[index_cur][max_frameAlise]
-            ]
-            if sum(blankCon_L_2_frame_valid) != 0:
-                qmessagebox.warning(self, '警告', '动作L2帧数设置有误')
-                return False
-
-            if int(self.lineEdit_pattern_fade_in_L_2.text()) <= int(self.lineEdit_pattern_fade_out_L_1.text()):
-                qmessagebox.warning(self, '警告', '动作L1，L2帧数设置有误')
-                return False
-        if self.checkBox_L_3.isChecked():
-            blankCon_L_3_frame_valid = [
-                int(self.lineEdit_pattern_index_L_3.text()) < 1,
-                int(self.lineEdit_pattern_index_L_3.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_L_3.text()) < 0,
-                int(self.lineEdit_pattern_start_L_3.text()) <= int(self.lineEdit_pattern_fade_in_L_3.text()),
-                int(self.lineEdit_pattern_end_L_3.text()) <= int(self.lineEdit_pattern_start_L_3.text()),
-                int(self.lineEdit_pattern_fade_out_L_3.text()) <= int(self.lineEdit_pattern_end_L_3.text()),
-                int(self.lineEdit_pattern_fade_out_L_3.text()) > dataGroup[index_cur][max_frameAlise]
-            ]
-            if sum(blankCon_L_3_frame_valid) != 0:
-                qmessagebox.warning(self, '警告', '动作L3帧数设置有误')
-                return False
-            if int(self.lineEdit_pattern_fade_in_L_3.text()) <= int(self.lineEdit_pattern_fade_out_L_2.text()):
-                qmessagebox.warning(self, '警告', '动作L2，L3帧数设置有误')
-                return False
-        if self.checkBox_L_4.isChecked():
-            blankCon_L_4_frame_valid = [
-                int(self.lineEdit_pattern_index_L_4.text()) < 1,
-                int(self.lineEdit_pattern_index_L_4.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_L_4.text()) < 0,
-                int(self.lineEdit_pattern_start_L_4.text()) <= int(self.lineEdit_pattern_fade_in_L_4.text()),
-                int(self.lineEdit_pattern_end_L_4.text()) <= int(self.lineEdit_pattern_start_L_4.text()),
-                int(self.lineEdit_pattern_fade_out_L_4.text()) <= int(self.lineEdit_pattern_end_L_4.text()),
-                int(self.lineEdit_pattern_fade_out_L_4.text()) > dataGroup[index_cur][max_frameAlise]
-            ]
-            if sum(blankCon_L_4_frame_valid) != 0:
-                qmessagebox.warning(self, '警告', '动作L4帧数设置有误')
-                return False
-            if int(self.lineEdit_pattern_fade_in_L_4.text()) <= int(self.lineEdit_pattern_fade_out_L_3.text()):
-                qmessagebox.warning(self, '警告', '动作L3，L4帧数设置有误')
-                return False
-        if self.checkBox_R_1.isChecked():
-            blankCon_R_1_frame_valid = [
-                int(self.lineEdit_pattern_index_R_1.text()) < 1,
-                int(self.lineEdit_pattern_index_R_1.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_R_1.text()) < 0,
-                int(self.lineEdit_pattern_start_R_1.text()) <= int(self.lineEdit_pattern_fade_in_R_1.text()),
-                int(self.lineEdit_pattern_end_R_1.text()) <= int(self.lineEdit_pattern_start_R_1.text()),
-                int(self.lineEdit_pattern_fade_out_R_1.text()) <= int(self.lineEdit_pattern_end_R_1.text()),
-                int(self.lineEdit_pattern_fade_out_R_1.text()) > dataGroup[index_cur][max_frameAlise]
-            ]
-
-            if sum(blankCon_R_1_frame_valid) != 0:
-                qmessagebox.warning(self, '警告', '动作R1帧数设置有误')
-                return False
-
-        if self.checkBox_R_2.isChecked():
-            blankCon_R_2_frame_valid = [
-                int(self.lineEdit_pattern_index_R_2.text()) < 1,
-                int(self.lineEdit_pattern_index_R_2.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_R_2.text()) < 0,
-                int(self.lineEdit_pattern_start_R_2.text()) <= int(self.lineEdit_pattern_fade_in_R_2.text()),
-                int(self.lineEdit_pattern_end_R_2.text()) <= int(self.lineEdit_pattern_start_R_2.text()),
-                int(self.lineEdit_pattern_fade_out_R_2.text()) <= int(self.lineEdit_pattern_end_R_2.text()),
-                int(self.lineEdit_pattern_fade_out_R_2.text()) > dataGroup[index_cur][max_frameAlise]
-            ]
-            if sum(blankCon_R_2_frame_valid) != 0:
-                qmessagebox.warning(self, '警告', '动作R2帧数设置有误')
-                return False
-            if int(self.lineEdit_pattern_fade_in_R_2.text()) <= int(self.lineEdit_pattern_fade_out_R_1.text()):
-                qmessagebox.warning(self, '警告', '动作R1，R2帧数设置有误')
-                return False
-        if self.checkBox_R_3.isChecked():
-            blankCon_R_3_frame_valid = [
-                int(self.lineEdit_pattern_index_R_3.text()) < 1,
-                int(self.lineEdit_pattern_index_R_3.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_R_3.text()) < 0,
-                int(self.lineEdit_pattern_start_R_3.text()) <= int(self.lineEdit_pattern_fade_in_R_3.text()),
-                int(self.lineEdit_pattern_end_R_3.text()) <= int(self.lineEdit_pattern_start_R_3.text()),
-                int(self.lineEdit_pattern_fade_out_R_3.text()) <= int(self.lineEdit_pattern_end_R_3.text()),
-                int(self.lineEdit_pattern_fade_out_R_3.text()) > dataGroup[index_cur][max_frameAlise]
-            ]
-            if sum(blankCon_R_3_frame_valid) != 0:
-                qmessagebox.warning(self, '警告', '动作R3帧数设置有误')
-                return False
-            if int(self.lineEdit_pattern_fade_in_R_3.text()) <= int(self.lineEdit_pattern_fade_out_R_2.text()):
-                qmessagebox.warning(self, '警告', '动作R2，R3帧数设置有误')
-                return False
-        if self.checkBox_R_4.isChecked():
-            blankCon_R_4_frame_valid = [
-                int(self.lineEdit_pattern_index_R_4.text()) < 1,
-                int(self.lineEdit_pattern_index_R_4.text()) > 61,
-                int(self.lineEdit_pattern_fade_in_R_4.text()) < 0,
-                int(self.lineEdit_pattern_start_R_4.text()) <= int(self.lineEdit_pattern_fade_in_R_4.text()),
-                int(self.lineEdit_pattern_end_R_4.text()) <= int(self.lineEdit_pattern_start_R_4.text()),
-                int(self.lineEdit_pattern_fade_out_R_4.text()) <= int(self.lineEdit_pattern_end_R_4.text()),
-                int(self.lineEdit_pattern_fade_out_R_4.text()) > dataGroup[index_cur][max_frameAlise]
-            ]
-            if sum(blankCon_R_4_frame_valid) != 0:
-                qmessagebox.warning(self, '警告', '动作R4帧数设置有误')
-                return False
-            if int(self.lineEdit_pattern_fade_in_R_4.text()) <= int(self.lineEdit_pattern_fade_out_R_3.text()):
-                qmessagebox.warning(self, '警告', '动作R3，R4帧数设置有误')
-                return False
+            ....................................
+        '''
 
         return True
 
@@ -885,9 +839,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         class Movie_MP4(Video):
             type = 'MP4'  # 此处以MP4格式为例
 
-        moviePath = os.path.join(rootPath, 'sourrcevideo', str(int(dataGroup[index_cur][videoAlise_res])) + '.mp4')
+        moviePath = os.path.join(rootPath, 'SourceVideo', str(int(dataGroup[index_cur][videoAlise_res])) + '.mp4')
         # print(rootPath)
-        # movie = Movie_MP4(r'E:\之江\pattern\sourrcevideo\00000001.mp4')
+        # movie = Movie_MP4(r'E:\之江\pattern\sourcevideo\00000001.mp4')
         try:
             movie = Movie_MP4(moviePath)
             movie.play()
@@ -914,9 +868,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for _ in range(8 - len(str(s))):
                 res = '0' + res
             return res
-        moviePath = os.path.join(rootPath, 'sourrcevideo', str(int(dataGroup[index_cur][videoAlise_aft])) + '.mp4')
-        # print(moviePath)
-        # movie = Movie_MP4(r'E:\之江\pattern\sourrcevideo\00000001.mp4')
+        moviePath = os.path.join(rootPath, 'SourceVideo', str(int(dataGroup[index_cur][videoAlise_aft])) + '.mp4')
+        print(moviePath)
+        # movie = Movie_MP4(r'E:\之江\pattern\sourcevideo\00000001.mp4')
         try:
             movie = Movie_MP4(moviePath)
             movie.play()
@@ -931,14 +885,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.checkBox_L_2.setChecked(0)
             self.checkBox_L_2.setEnabled(0)
-            self.set_L_2_able_all(0)
+            self.set_L_2_able_all(False)
         if self.checkBox_L_2.isChecked():
             # self.set_L_3_able_all(1)
             self.checkBox_L_3.setEnabled(1)
         else:
             self.checkBox_L_3.setChecked(0)
             self.checkBox_L_3.setEnabled(0)
-            self.set_L_3_able_all(0)
+            self.set_L_3_able_all(False)
 
         if self.checkBox_L_3.isChecked():
             self.checkBox_L_4.setEnabled(1)
@@ -946,7 +900,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.checkBox_L_4.setChecked(0)
             self.checkBox_L_4.setEnabled(0)
-            self.set_L_4_able_all(0)
+            self.set_L_4_able_all(False)
 
     def set_L_1_able_all(self, con: bool):
         self.lineEdit_pattern_index_L_1.setEnabled(con)
@@ -1011,14 +965,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.checkBox_R_2.setChecked(0)
             self.checkBox_R_2.setEnabled(0)
-            self.set_R_2_able_all(0)
+            self.set_R_2_able_all(False)
         if self.checkBox_R_2.isChecked():
             # self.set_R_3_able_all(1)
             self.checkBox_R_3.setEnabled(1)
         else:
             self.checkBox_R_3.setChecked(0)
             self.checkBox_R_3.setEnabled(0)
-            self.set_R_3_able_all(0)
+            self.set_R_3_able_all(False)
 
         if self.checkBox_R_3.isChecked():
             self.checkBox_R_4.setEnabled(1)
@@ -1026,7 +980,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.checkBox_R_4.setChecked(0)
             self.checkBox_R_4.setEnabled(0)
-            self.set_R_4_able_all(0)
+            self.set_R_4_able_all(False)
 
     def set_R_1_able_all(self, con: bool):
         self.lineEdit_pattern_index_R_1.setEnabled(con)
