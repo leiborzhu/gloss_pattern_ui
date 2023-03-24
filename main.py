@@ -177,7 +177,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             for index in range(1, 5):
                 exec('self.checkBox_' + strHand + '_' + str(index) + '.clicked.connect(self.set_' + strHand + '_' + str(index) + '_able)')
         '''
-        self.checkBox_L_1.clicked.connect(self.set_L_1_able)
+        self.checkBox_L_1.clicked.connect(self.set_box_able_line(strHand: str, index: int):)
         ...................
         '''
 
@@ -217,15 +217,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.checkBox_R_4.setChecked(con)
 
     def set_all_able(self, con: bool):
-        self.set_L_1_able_all(con)
-        self.set_L_2_able_all(con)
-        self.set_L_3_able_all(con)
-        self.set_L_4_able_all(con)
+        # self.set_L_1_able_all(con)
+        self.set_box_able_all(con, 'L', 1)
+        self.set_box_able_all(con, 'L', 2)
+        self.set_box_able_all(con, 'L', 3)
+        self.set_box_able_all(con, 'L', 4)
 
-        self.set_R_1_able_all(con)
-        self.set_R_2_able_all(con)
-        self.set_R_3_able_all(con)
-        self.set_R_4_able_all(con)
+        self.set_box_able_all(con, 'R', 1)
+        self.set_box_able_all(con, 'R', 2)
+        self.set_box_able_all(con, 'R', 3)
+        self.set_box_able_all(con, 'R', 4)
 
     def set_changeBox_able_R(self):
         if self.checkBox_R_1.isChecked():
@@ -257,10 +258,10 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 for strHand in ['L', 'R']:
                     for index in range(1, 5):
                         if eval('self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
-                            exec('self.set_' + strHand + '_' + str(index) + '_able_all(True)')
+                            exec('self.set_box_able_all(True, strHand, index)')
                 '''
                 if self.checkBox_L_1.isChecked():
-                    self.set_L_1_able_all(True)
+                    set_box_able_all(True, strHand, index)
                 ...................
                 '''
             else:
@@ -275,12 +276,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                 self.set_link_able_L()
                 for strHand in ['L', 'R']:
                     for index in range(1, 5):
-                        if eval('str(self.lineEdit_pattern_index_' + strHand + '_' + str(index) +
-                                '.text()) != "" and self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
-                            exec('self.set_' + strHand + '_' + str(index) + '_able_all(True)')
+                        if eval('self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
+                            exec('self.set_box_able_all(True, strHand, index)')
                 '''
-                if str(self.lineEdit_pattern_index_L_1.text()) != '' and self.checkBox_L_1.isChecked():
-                    self.set_L_1_able_all(True)
+                if self.checkBox_L_1.isChecked():
+                    set_box_able_all(True, strHand, index)
                     .........................
                 '''
             else:
@@ -318,7 +318,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
                         for i in range(len(alsGroup)):
                             line = 'self.lineEdit_pattern_' + boxGroup[i] + '_' + strHand + '_' + str(index) + \
                                    '.setText(str(int(lineCur[' + alsGroup[i] + '_' + strHand + '_' + str(index) + '])))'
-                            # print(line)
                             exec(line)
                     else:
                         exec('self.checkBox_' + strHand + '_' + str(index) + '.setChecked(0)')
@@ -599,7 +598,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def check_isChecked(self) -> bool:
         qmessagebox = QMessageBox()
         if dataGroup[index_cur][isCorrectAlise] != '':
-            if int(dataGroup[index_cur][isCorrectAlise]) == 1:
+            if not self.checkBox_checkMode.isChecked() and self.radioButton_1.isChecked():
                 haveChecked = self.checkBox_L_1.isChecked() + self.checkBox_R_1.isChecked()
                 # print(haveChecked)
                 if not haveChecked:
@@ -627,7 +626,21 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def check_isnum_valid(self) -> bool:
         qmessagebox = QMessageBox()
-        if self.checkBox_L_1.isChecked():
+        boxGroup = ['index', 'fade_in', 'fade_out', 'start', 'end']
+        blankCon_isnum = []
+        for strHand in ['L', 'R']:
+            for index in range(1, 5):
+                if eval('self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
+                    blankCon_isnum = []
+                    for box in boxGroup:
+                        exec('blankCon_isnum.append(not self.lineEdit_pattern_' + box + '_' + strHand + '_' +
+                            str(index) + '.text().isnumeric())')
+
+                    if eval('sum(blankCon_isnum) != 0'):
+                        exec('qmessagebox.warning(self, "警告", "动作" + strHand + str(index) + "填写不规范")')
+                        return False
+
+        '''if self.checkBox_L_1.isChecked():
             blankCon_L_1_isnum = [
                 not self.lineEdit_pattern_index_L_1.text().isnumeric(),
                 not self.lineEdit_pattern_fade_in_L_1.text().isnumeric(),
@@ -638,114 +651,35 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             if sum(blankCon_L_1_isnum) != 0:
                 qmessagebox.warning(self, '警告', '动作L1填写不规范')
                 return False
-        
-        if self.checkBox_L_2.isChecked():
-            blankCon_L_2_isnum = [
-                not self.lineEdit_pattern_index_L_2.text().isnumeric(),
-                not self.lineEdit_pattern_fade_in_L_2.text().isnumeric(),
-                not self.lineEdit_pattern_fade_out_L_2.text().isnumeric(),
-                not self.lineEdit_pattern_start_L_2.text().isnumeric(),
-                not self.lineEdit_pattern_end_L_2.text().isnumeric(),
-            ]
-            if sum(blankCon_L_2_isnum) != 0:
-                qmessagebox.warning(self, '警告', '动作L2填写不规范')
-                return False
-        
-        if self.checkBox_L_3.isChecked():
-            blankCon_L_3_isnum = [
-                not self.lineEdit_pattern_index_L_3.text().isnumeric(),
-                not self.lineEdit_pattern_fade_in_L_3.text().isnumeric(),
-                not self.lineEdit_pattern_fade_out_L_3.text().isnumeric(),
-                not self.lineEdit_pattern_start_L_3.text().isnumeric(),
-                not self.lineEdit_pattern_end_L_3.text().isnumeric(),
-            ]
-            if sum(blankCon_L_3_isnum) != 0:
-                qmessagebox.warning(self, '警告', '动作L3填写不规范')
-                return False
-        
-        if self.checkBox_L_4.isChecked():
-            blankCon_L_4_isnum = [
-                not self.lineEdit_pattern_index_L_4.text().isnumeric(),
-                not self.lineEdit_pattern_fade_in_L_4.text().isnumeric(),
-                not self.lineEdit_pattern_fade_out_L_4.text().isnumeric(),
-                not self.lineEdit_pattern_start_L_4.text().isnumeric(),
-                not self.lineEdit_pattern_end_L_4.text().isnumeric(),
-            ]
-            if sum(blankCon_L_4_isnum) != 0:
-                qmessagebox.warning(self, '警告', '动作L4填写不规范')
-                return False
-        
-        if self.checkBox_R_1.isChecked():
-            blankCon_R_1_isnum = [
-                not self.lineEdit_pattern_index_R_1.text().isnumeric(),
-                not self.lineEdit_pattern_fade_in_R_1.text().isnumeric(),
-                not self.lineEdit_pattern_fade_out_R_1.text().isnumeric(),
-                not self.lineEdit_pattern_start_R_1.text().isnumeric(),
-                not self.lineEdit_pattern_end_R_1.text().isnumeric(),
-            ]
-            if sum(blankCon_R_1_isnum) != 0:
-                qmessagebox.warning(self, '警告', '动作R1填写不规范')
-                return False
-
-        if self.checkBox_R_2.isChecked():
-            blankCon_R_2_isnum = [
-                not self.lineEdit_pattern_index_R_2.text().isnumeric(),
-                not self.lineEdit_pattern_fade_in_R_2.text().isnumeric(),
-                not self.lineEdit_pattern_fade_out_R_2.text().isnumeric(),
-                not self.lineEdit_pattern_start_R_2.text().isnumeric(),
-                not self.lineEdit_pattern_end_R_2.text().isnumeric(),
-            ]
-            if sum(blankCon_R_2_isnum) != 0:
-                qmessagebox.warning(self, '警告', '动作R2填写不规范')
-                return False
-
-        if self.checkBox_R_3.isChecked():
-            blankCon_R_3_isnum = [
-                not self.lineEdit_pattern_index_R_3.text().isnumeric(),
-                not self.lineEdit_pattern_fade_in_R_3.text().isnumeric(),
-                not self.lineEdit_pattern_fade_out_R_3.text().isnumeric(),
-                not self.lineEdit_pattern_start_R_3.text().isnumeric(),
-                not self.lineEdit_pattern_end_R_3.text().isnumeric(),
-            ]
-            if sum(blankCon_R_3_isnum) != 0:
-                qmessagebox.warning(self, '警告', '动作R3填写不规范')
-                return False
-
-        if self.checkBox_R_4.isChecked():
-            blankCon_R_4_isnum = [
-                not self.lineEdit_pattern_index_R_4.text().isnumeric(),
-                not self.lineEdit_pattern_fade_in_R_4.text().isnumeric(),
-                not self.lineEdit_pattern_fade_out_R_4.text().isnumeric(),
-                not self.lineEdit_pattern_start_R_4.text().isnumeric(),
-                not self.lineEdit_pattern_end_R_4.text().isnumeric(),
-            ]
-            if sum(blankCon_R_4_isnum) != 0:
-                qmessagebox.warning(self, '警告', '动作R4填写不规范')
-                return False
+            .......................................
+        '''
         return True
 
     def check_frame_valid(self) -> bool:
         qmessagebox = QMessageBox()
         blankCon_frame_valid_tmp = []
+        index_start = 1
+        index_end = 61
+        frameGap = 5
         for strHand in ['L', 'R']:
             for index in range(1, 5):
                 if eval('self.checkBox_' + strHand + '_' + str(index) + '.isChecked()'):
                     blankCon_frame_valid_tmp = []
                     exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_index_' +
-                         strHand + '_' + str(index) + '.text().strip()) < 1)')
+                         strHand + '_' + str(index) + '.text().strip()) < index_start)')
                     exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_index_' +
-                         strHand + '_' + str(index) + '.text().strip()) > 61)')
+                         strHand + '_' + str(index) + '.text().strip()) > index_end)')
                     exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_fade_in_' +
                          strHand + '_' + str(index) + '.text().strip()) < 0)')
                     exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_start_' +
                          strHand + '_' + str(index) + '.text().strip()) <= int(self.lineEdit_pattern_fade_in_' +
-                         strHand + '_' + str(index) + '.text().strip()))')
+                         strHand + '_' + str(index) + '.text().strip()) + frameGap)')
                     exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_end_' +
                          strHand + '_' + str(index) + '.text().strip()) <= int(self.lineEdit_pattern_start_' +
-                         strHand + '_' + str(index) + '.text().strip()))')
+                         strHand + '_' + str(index) + '.text().strip()) + frameGap)')
                     exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_fade_out_' +
                          strHand + '_' + str(index) + '.text().strip()) <= int(self.lineEdit_pattern_end_' +
-                         strHand + '_' + str(index) + '.text().strip()))')
+                         strHand + '_' + str(index) + '.text().strip()) + frameGap)')
                     exec('blankCon_frame_valid_tmp.append(int(self.lineEdit_pattern_fade_out_' +
                          strHand + '_' + str(index) + '.text().strip()) > dataGroup[index_cur][max_frameAlise])')
                 # print(blankCon_frame_valid_tmp)
@@ -756,8 +690,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         '''if self.checkBox_L_1.isChecked():
 
             blankCon_L_1_frame_valid = [
-                int(self.lineEdit_pattern_index_L_1.text().strip()) < 1,
-                int(self.lineEdit_pattern_index_L_1.text().strip()) > 61,
+                int(self.lineEdit_pattern_index_L_1.text().strip()) < index_start,
+                int(self.lineEdit_pattern_index_L_1.text().strip()) > index_end,
                 int(self.lineEdit_pattern_fade_in_L_1.text().strip()) < 0,
                 int(self.lineEdit_pattern_start_L_1.text().strip()) <= int(self.lineEdit_pattern_fade_in_L_1.text().strip()),
                 int(self.lineEdit_pattern_end_L_1.text().strip()) <= int(self.lineEdit_pattern_start_L_1.text().strip()),
@@ -878,86 +812,73 @@ class MyWindow(QMainWindow, Ui_MainWindow):
             qmessagebox.warning(self, '警告', '视频打开失败')
             return
 
+    def set_box_able_all(self, con: bool, strHand: str, index: int):
+        boxGroup = ['index', 'fade_in', 'end', 'fade_out', 'start']
+        for box in boxGroup:
+            exec('self.lineEdit_pattern_' + box + '_' + strHand + '_' + str(index) + '.setEnabled(con)')
+
+    def set_box_able_line(self, strHand: str, index: int):
+        exec("self.set_box_able_all(self.checkBox_" + strHand + "_" + str(index) + ".isChecked(), " + "strHand, " + str(index) + ")")
+        exec("self.set_link_able_" + strHand + "()")
+
+    # 绑定按钮函数
+    def set_L_1_able(self):
+        self.set_box_able_all(self.checkBox_L_1.isChecked(), 'L', 1)
+        self.set_link_able_L()
+
+    def set_L_2_able(self):
+        self.set_box_able_all(self.checkBox_L_2.isChecked(), 'L', 2)
+        self.set_link_able_L()
+
+    def set_L_3_able(self):
+        self.set_box_able_all(self.checkBox_L_3.isChecked(), 'L', 3)
+        self.set_link_able_L()
+
+    def set_L_4_able(self):
+        self.set_box_able_all(self.checkBox_L_4.isChecked(), 'L', 4)
+        self.set_link_able_L()
+
     def set_link_able_L(self):
         if self.checkBox_L_1.isChecked():
             self.checkBox_L_2.setEnabled(1)
-            # self.set_L_2_able_all(1)
+
         else:
             self.checkBox_L_2.setChecked(0)
             self.checkBox_L_2.setEnabled(0)
-            self.set_L_2_able_all(False)
+            self.set_box_able_all(False, 'L', 2)
+
         if self.checkBox_L_2.isChecked():
-            # self.set_L_3_able_all(1)
             self.checkBox_L_3.setEnabled(1)
+
+
         else:
             self.checkBox_L_3.setChecked(0)
             self.checkBox_L_3.setEnabled(0)
-            self.set_L_3_able_all(False)
+            self.set_box_able_all(False, 'L', 3)
 
         if self.checkBox_L_3.isChecked():
             self.checkBox_L_4.setEnabled(1)
-            # self.set_L_4_able_all(1)
+
         else:
             self.checkBox_L_4.setChecked(0)
             self.checkBox_L_4.setEnabled(0)
-            self.set_L_4_able_all(False)
+            self.set_box_able_all(False, 'L', 4)
 
-    def set_L_1_able_all(self, con: bool):
-        self.lineEdit_pattern_index_L_1.setEnabled(con)
-        self.lineEdit_pattern_fade_in_L_1.setEnabled(con)
-        self.lineEdit_pattern_end_L_1.setEnabled(con)
-        self.lineEdit_pattern_fade_out_L_1.setEnabled(con)
-        self.lineEdit_pattern_start_L_1.setEnabled(con)
+    def set_R_1_able(self):
+        self.set_box_able_all(self.checkBox_R_1.isChecked(), 'R', 1)
+        self.set_link_able_R()
 
-    def set_L_1_able(self):
-        if self.checkBox_L_1.isChecked():
-            self.set_L_1_able_all(True)
-        else:
-            self.set_L_1_able_all(False)
-        self.set_link_able_L()
+    def set_R_2_able(self):
+        self.set_box_able_all(self.checkBox_R_2.isChecked(), 'R', 2)
+        self.set_link_able_R()
 
-    def set_L_2_able_all(self, con: bool):
-        self.lineEdit_pattern_index_L_2.setEnabled(con)
-        self.lineEdit_pattern_fade_in_L_2.setEnabled(con)
-        self.lineEdit_pattern_end_L_2.setEnabled(con)
-        self.lineEdit_pattern_fade_out_L_2.setEnabled(con)
-        self.lineEdit_pattern_start_L_2.setEnabled(con)
+    def set_R_3_able(self):
+        self.set_box_able_all(self.checkBox_R_3.isChecked(), 'R', 3)
+        self.set_link_able_R()
 
-    def set_L_2_able(self):
-        if self.checkBox_L_2.isChecked():
-            self.set_L_2_able_all(True)
-        else:
-            self.set_L_2_able_all(False)
-        self.set_link_able_L()
-
-    def set_L_3_able_all(self, con: bool):
-        self.lineEdit_pattern_index_L_3.setEnabled(con)
-        self.lineEdit_pattern_fade_in_L_3.setEnabled(con)
-        self.lineEdit_pattern_end_L_3.setEnabled(con)
-        self.lineEdit_pattern_fade_out_L_3.setEnabled(con)
-        self.lineEdit_pattern_start_L_3.setEnabled(con)
-
-    def set_L_3_able(self):
-        if self.checkBox_L_3.isChecked():
-            self.set_L_3_able_all(True)
-        else:
-            self.set_L_3_able_all(False)
-        self.set_link_able_L()
-
-    def set_L_4_able_all(self, con: bool):
-        self.lineEdit_pattern_index_L_4.setEnabled(con)
-        self.lineEdit_pattern_fade_in_L_4.setEnabled(con)
-        self.lineEdit_pattern_end_L_4.setEnabled(con)
-        self.lineEdit_pattern_fade_out_L_4.setEnabled(con)
-        self.lineEdit_pattern_start_L_4.setEnabled(con)
-
-    def set_L_4_able(self):
-        if self.checkBox_L_4.isChecked():
-            self.set_L_4_able_all(True)
-        else:
-            self.set_L_4_able_all(False)
-
-        self.set_link_able_L()
+    def set_R_4_able(self):
+        self.set_box_able_all(self.checkBox_R_4.isChecked(), 'R', 4)
+        self.set_link_able_R()
 
     def set_link_able_R(self):
         if self.checkBox_R_1.isChecked():
@@ -965,14 +886,15 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.checkBox_R_2.setChecked(0)
             self.checkBox_R_2.setEnabled(0)
-            self.set_R_2_able_all(False)
+            self.set_box_able_all(False, 'R', 2)
+
         if self.checkBox_R_2.isChecked():
             # self.set_R_3_able_all(1)
             self.checkBox_R_3.setEnabled(1)
         else:
             self.checkBox_R_3.setChecked(0)
             self.checkBox_R_3.setEnabled(0)
-            self.set_R_3_able_all(False)
+            self.set_box_able_all(False, 'R', 3)
 
         if self.checkBox_R_3.isChecked():
             self.checkBox_R_4.setEnabled(1)
@@ -980,68 +902,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         else:
             self.checkBox_R_4.setChecked(0)
             self.checkBox_R_4.setEnabled(0)
-            self.set_R_4_able_all(False)
-
-    def set_R_1_able_all(self, con: bool):
-        self.lineEdit_pattern_index_R_1.setEnabled(con)
-        self.lineEdit_pattern_fade_in_R_1.setEnabled(con)
-        self.lineEdit_pattern_end_R_1.setEnabled(con)
-        self.lineEdit_pattern_fade_out_R_1.setEnabled(con)
-        self.lineEdit_pattern_start_R_1.setEnabled(con)
-
-    def set_R_1_able(self):
-        if self.checkBox_R_1.isChecked():
-            self.set_R_1_able_all(True)
-        else:
-
-            self.set_R_1_able_all(False)
-
-        self.set_link_able_R()
-
-    def set_R_2_able_all(self, con: bool):
-        self.lineEdit_pattern_index_R_2.setEnabled(con)
-        self.lineEdit_pattern_fade_in_R_2.setEnabled(con)
-        self.lineEdit_pattern_end_R_2.setEnabled(con)
-        self.lineEdit_pattern_fade_out_R_2.setEnabled(con)
-        self.lineEdit_pattern_start_R_2.setEnabled(con)
-
-    def set_R_2_able(self):
-        if self.checkBox_R_2.isChecked():
-            self.set_R_2_able_all(True)
-        else:
-            self.set_R_2_able_all(False)
-
-        self.set_link_able_R()
-
-    def set_R_3_able_all(self, con: bool):
-        self.lineEdit_pattern_index_R_3.setEnabled(con)
-        self.lineEdit_pattern_fade_in_R_3.setEnabled(con)
-        self.lineEdit_pattern_end_R_3.setEnabled(con)
-        self.lineEdit_pattern_fade_out_R_3.setEnabled(con)
-        self.lineEdit_pattern_start_R_3.setEnabled(con)
-
-    def set_R_3_able(self):
-        if self.checkBox_R_3.isChecked():
-            self.set_R_3_able_all(True)
-        else:
-            self.set_R_3_able_all(False)
-
-        self.set_link_able_R()
-
-    def set_R_4_able_all(self, con: bool):
-        self.lineEdit_pattern_index_R_4.setEnabled(con)
-        self.lineEdit_pattern_fade_in_R_4.setEnabled(con)
-        self.lineEdit_pattern_end_R_4.setEnabled(con)
-        self.lineEdit_pattern_fade_out_R_4.setEnabled(con)
-        self.lineEdit_pattern_start_R_4.setEnabled(con)
-
-    def set_R_4_able(self):
-        if self.checkBox_R_4.isChecked():
-            self.set_R_4_able_all(True)
-        else:
-            self.set_R_4_able_all(False)
-
-        self.set_link_able_R()
+            self.set_box_able_all(False, 'R', 4)
 
     def saveCondiChange(self):
         saveCon = 0
